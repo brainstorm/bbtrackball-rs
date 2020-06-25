@@ -1,0 +1,32 @@
+name: kicad-automation
+
+on:
+  push:
+    paths:
+    - '**.sch'
+    - '**.kicad_pcb'
+  pull_request:
+    paths:
+      - '**.sch'
+      - '**.kicad_pcb'
+
+jobs:
+  fabrication:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: nerdyscout/kicad-exports@v0.2
+      with:
+        cmd: fabrication 
+        dir: gerbers 
+        manufacturer: "jlcpcb"
+    - uses: nerdyscout/kicad-exports@v0.2
+      with:
+        cmd: ibom
+        dir: bom
+    - name: upload results
+      uses: actions/upload-artifact@v2
+      with:
+        name: gerbers
+        path: gerbers
