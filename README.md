@@ -1,7 +1,7 @@
 # Minitrackball for keyboard experiment
 
-The purpose of this project is to build [an ergonomic, integrated replacement for a regular keyboard].
+The purpose of this project is to build [an ergonomic, integrated replacement for a regular keyboard][bb_trackball].
 
 Be it Microsoft Natural Keyboard 4000 or any other (better) mechanical keyboard, **we shall not strain our shoulder plates to reach the mouse anymore!**
 
-[driving_blackberry_trackball]: https://os.mbed.com/users/AdamGreen/notebook/blackberrytrackballmouse/ 
+[bb_trackball]: https://os.mbed.com/users/AdamGreen/notebook/blackberrytrackballmouse/ 
