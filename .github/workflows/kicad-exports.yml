@@ -3,11 +3,13 @@ name: kicad-automation
 on:
   push:
     paths:
-    - '**.sch'
+    - 'hardware/Sparkfun_Trackballer/kicad/*.sch'
+    - 'stm32-dev-0.1/*.sch'
     - '**.kicad_pcb'
   pull_request:
     paths:
-      - '**.sch'
+      - 'hardware/Sparkfun_Trackballer/kicad/*.sch'
+      - 'stm32-dev-0.1/*.sch'
       - '**.kicad_pcb'
 
 jobs:
