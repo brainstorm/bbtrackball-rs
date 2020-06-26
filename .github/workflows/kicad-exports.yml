@@ -3,13 +3,12 @@ name: kicad-automation
 on:
   push:
     paths:
-    - 'hardware/Sparkfun_Trackballer/kicad/*.sch'
-    - 'stm32-dev-0.1/*.sch'
+#    - 'hardware/Sparkfun_Trackballer/kicad/*.sch'
+    - '**.sch'
     - '**.kicad_pcb'
   pull_request:
     paths:
-      - 'hardware/Sparkfun_Trackballer/kicad/*.sch'
-      - 'stm32-dev-0.1/*.sch'
+      - '**.sch'
       - '**.kicad_pcb'
 
 jobs:
@@ -18,17 +17,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: nerdyscout/kicad-exports@v0.2
+    - uses: nerdyscout/kicad-exports@v1.0
       with:
-        cmd: fabrication 
+        cmd: fabrication
+        schematic: stm32_dev.sch
+        board: stm32_dev.kicad_pcb
         dir: gerbers 
         manufacturer: "jlcpcb"
-    - uses: nerdyscout/kicad-exports@v0.2
+    - uses: nerdyscout/kicad-exports@v1.0
       with:
-        cmd: ibom
+        cmd: bom
+        schematic: stm32_dev.sch
+        board: stm32_dev.kicad_pcb
         dir: bom
     - name: upload results
       uses: actions/upload-artifact@v2
       with:
         name: gerbers
+        schematic: stm32_dev.sch
+        board: stm32_dev.kicad_pcb
         path: gerbers
