@@ -23,11 +23,6 @@ jobs:
 #        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
     - uses: nerdyscout/kicad-exports@v1.0
       with:
-        cmd: drc
-        schematic: hardware/stm32-trackball/stm32_dev.sch
-        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
-    - uses: nerdyscout/kicad-exports@v1.0
-      with:
         cmd: schematic
         schematic: hardware/stm32-trackball/stm32_dev.sch
         dir: schematic
