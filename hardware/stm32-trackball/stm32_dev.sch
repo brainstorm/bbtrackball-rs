@@ -216,7 +216,7 @@ U 1 1 5E1D2BD3
 P 3150 7150
 F 0 "SW2" V 3196 7102 50  0000 R CNN
 F 1 "SIDE" V 3105 7102 50  0000 R CNN
-F 2 "josh-buttons-switches:Panasonic_EVQPUL_EVQPUC" H 3150 7350 50  0001 C CNN
+F 2 "josh-buttons-switches:SW_Push_KMR2" H 3150 7350 50  0001 C CNN
 F 3 "~" H 3150 7350 50  0001 C CNN
 F 4 "C221909" H 3150 7150 50  0001 C CNN "LCSC"
 F 5 "PTS840GMSMTRLFS" H 3150 7150 50  0001 C CNN "MPN"
@@ -480,43 +480,20 @@ Wire Wire Line
 	5000 2000 4950 2000
 Wire Wire Line
 	5300 2000 5450 2000
-$Comp
-L Device:C C4
-U 1 1 5EFBB364
-P 5150 1800
-F 0 "C4" V 5100 1900 50  0000 C CNN
-F 1 "100n" V 5200 1950 50  0000 C CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 5188 1650 50  0001 C CNN
-F 3 "~" H 5150 1800 50  0001 C CNN
-	1    5150 1800
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	5000 1800 4950 1800
-Wire Wire Line
-	5300 1800 5450 1800
-Wire Wire Line
-	4950 1650 4950 1800
-Connection ~ 4950 1800
-Wire Wire Line
-	4950 1800 4950 2000
 Connection ~ 4950 2000
 Wire Wire Line
 	4950 2000 4950 2200
 $Comp
 L power:+3V3 #PWR0103
 U 1 1 5EFBDFDD
-P 4950 1650
-F 0 "#PWR0103" H 4950 1500 50  0001 C CNN
-F 1 "+3V3" H 4965 1823 50  0000 C CNN
-F 2 "" H 4950 1650 50  0001 C CNN
-F 3 "" H 4950 1650 50  0001 C CNN
-	1    4950 1650
+P 4950 1850
+F 0 "#PWR0103" H 4950 1700 50  0001 C CNN
+F 1 "+3V3" H 4965 2023 50  0000 C CNN
+F 2 "" H 4950 1850 50  0001 C CNN
+F 3 "" H 4950 1850 50  0001 C CNN
+	1    4950 1850
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5450 1800 5450 2000
-Connection ~ 5450 2000
 Wire Wire Line
 	5450 2000 5450 2200
 Connection ~ 5450 2200
@@ -552,9 +529,9 @@ TB_UP
 Text Label 6250 3400 2    50   ~ 0
 TB_DOWN
 Text Label 6250 3600 2    50   ~ 0
-USB_DP
+USB_P
 Text Label 6250 3500 2    50   ~ 0
-USB_DM
+USB_N
 Text Label 6250 3700 2    50   ~ 0
 SWDIO
 Text Label 6250 3800 2    50   ~ 0
@@ -648,9 +625,9 @@ Wire Wire Line
 Wire Wire Line
 	1650 2400 2250 2400
 Text Label 3450 2400 2    50   ~ 0
-USB_DP
+USB_P
 Text Label 3450 2200 2    50   ~ 0
-USB_DM
+USB_N
 Wire Wire Line
 	3050 2200 3450 2200
 Wire Wire Line
@@ -754,7 +731,7 @@ U 1 1 5E1B7FD4
 P 2050 6750
 F 0 "SW1" V 2096 6702 50  0000 R CNN
 F 1 "SIDE" V 2005 6702 50  0000 R CNN
-F 2 "josh-buttons-switches:Panasonic_EVQPUL_EVQPUC" H 2050 6950 50  0001 C CNN
+F 2 "josh-buttons-switches:SW_Push_KMR2" H 2050 6950 50  0001 C CNN
 F 3 "~" H 2050 6950 50  0001 C CNN
 F 4 "C221909" H 2050 6750 50  0001 C CNN "LCSC"
 F 5 "PTS840GMSMTRLFS" H 2050 6750 50  0001 C CNN "MPN"
@@ -1077,39 +1054,28 @@ Wire Wire Line
 	7900 5350 7900 5450
 Wire Wire Line
 	8050 5550 8050 5600
-$Comp
-L Connector:Conn_01x06_Male J4
-U 1 1 5F3470ED
-P 5650 7250
-F 0 "J4" H 5622 7224 50  0000 R CNN
-F 1 "Spare" H 5622 7133 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 5650 7250 50  0001 C CNN
-F 3 "~" H 5650 7250 50  0001 C CNN
-	1    5650 7250
-	-1   0    0    -1  
-$EndComp
-Text Label 3950 2900 0    50   ~ 0
-SPARE_1
 Text Label 3950 3000 0    50   ~ 0
+SPARE_1
+Text Label 3950 2900 0    50   ~ 0
 SPARE_2
-Text Label 3950 3400 0    50   ~ 0
+Text Label 3950 3600 0    50   ~ 0
 SPARE_3
 Text Label 3950 3500 0    50   ~ 0
 SPARE_4
-Text Label 3950 3600 0    50   ~ 0
+Text Label 3950 3400 0    50   ~ 0
 SPARE_5
 Wire Wire Line
-	3950 2900 4450 2900
+	3950 3000 4450 3000
 Wire Wire Line
-	4450 3000 3950 3000
+	4450 2900 3950 2900
 Wire Wire Line
-	4450 3400 3950 3400
+	4450 3600 3950 3600
 Wire Wire Line
 	4450 3500 3950 3500
 Wire Wire Line
-	4450 3600 3950 3600
+	4450 3400 3950 3400
 Text Label 6250 3900 2    50   ~ 0
-SPARE_5
+SPARE_6
 Wire Wire Line
 	5750 3900 6250 3900
 Text Label 4950 7050 0    50   ~ 0
@@ -1126,16 +1092,12 @@ Text Label 4950 7350 0    50   ~ 0
 SPARE_4
 Text Label 4950 7450 0    50   ~ 0
 SPARE_5
-Text Label 4950 7550 0    50   ~ 0
-SPARE_6
 Wire Wire Line
 	4950 7250 5450 7250
 Wire Wire Line
 	4950 7350 5450 7350
 Wire Wire Line
 	4950 7450 5450 7450
-Wire Wire Line
-	4950 7550 5450 7550
 Text Label 8850 2700 2    50   ~ 0
 TB_RIGHT
 Wire Wire Line
@@ -1754,19 +1716,6 @@ Wire Wire Line
 	8400 3500 8350 3500
 Text Notes 7450 1400 0    100  ~ 0
 Hall Effect\nSensors
-$Comp
-L Switch:SW_Push SW3
-U 1 1 5F745B1B
-P 9950 3450
-F 0 "SW3" V 9996 3402 50  0000 R CNN
-F 1 "SW_Push" V 9905 3402 50  0000 R CNN
-F 2 "josh-keyboard:Trackball_Tactile_Switch" H 9950 3650 50  0001 C CNN
-F 3 "~" H 9950 3650 50  0001 C CNN
-	1    9950 3450
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	9950 3250 9950 3150
 Text Label 9450 3150 0    50   ~ 0
 nTB_BUTTON
 Wire Wire Line
@@ -1798,19 +1747,6 @@ F 3 "" H 9950 2500 50  0001 C CNN
 	1    9950 2500
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9950 3650 9950 3700
-$Comp
-L power:GND #PWR0141
-U 1 1 5F791A29
-P 9950 3700
-F 0 "#PWR0141" H 9950 3450 50  0001 C CNN
-F 1 "GND" H 9955 3527 50  0000 C CNN
-F 2 "" H 9950 3700 50  0001 C CNN
-F 3 "" H 9950 3700 50  0001 C CNN
-	1    9950 3700
-	1    0    0    -1  
-$EndComp
 $Comp
 L Mechanical:MountingHole T1
 U 1 1 5F7C8C3A
@@ -1824,4 +1760,80 @@ F 3 "~" H 10400 3150 50  0001 C CNN
 $EndComp
 Text Notes 9700 2150 0    100  ~ 0
 Trackball
+Wire Wire Line
+	4950 1850 4950 2000
+$Comp
+L Mechanical:MountingHole H2
+U 1 1 5F00E4A6
+P 5100 6250
+F 0 "H2" H 5200 6296 50  0000 L CNN
+F 1 "Fuduical" H 5200 6205 50  0000 L CNN
+F 2 "Fiducial:Fiducial_1mm_Mask2mm" H 5100 6250 50  0001 C CNN
+F 3 "~" H 5100 6250 50  0001 C CNN
+	1    5100 6250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole H3
+U 1 1 5F014E75
+P 5100 6450
+F 0 "H3" H 5200 6496 50  0000 L CNN
+F 1 "Fuduical" H 5200 6405 50  0000 L CNN
+F 2 "Fiducial:Fiducial_1mm_Mask2mm" H 5100 6450 50  0001 C CNN
+F 3 "~" H 5100 6450 50  0001 C CNN
+	1    5100 6450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole H1
+U 1 1 5F015095
+P 5100 6050
+F 0 "H1" H 5200 6096 50  0000 L CNN
+F 1 "Fuduical" H 5200 6005 50  0000 L CNN
+F 2 "Fiducial:Fiducial_1mm_Mask2mm" H 5100 6050 50  0001 C CNN
+F 3 "~" H 5100 6050 50  0001 C CNN
+	1    5100 6050
+	1    0    0    -1  
+$EndComp
+Text Label 4950 7550 0    50   ~ 0
+SPARE_6
+Wire Wire Line
+	4950 7550 5450 7550
+$Comp
+L Connector:Conn_01x06_Male J4
+U 1 1 5F02F257
+P 5650 7250
+F 0 "J4" H 5622 7224 50  0000 R CNN
+F 1 "SPARE" H 5622 7133 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 5650 7250 50  0001 C CNN
+F 3 "~" H 5650 7250 50  0001 C CNN
+	1    5650 7250
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	9950 3250 9950 3150
+$Comp
+L power:GND #PWR0141
+U 1 1 5F791A29
+P 9950 3700
+F 0 "#PWR0141" H 9950 3450 50  0001 C CNN
+F 1 "GND" H 9955 3527 50  0000 C CNN
+F 2 "" H 9950 3700 50  0001 C CNN
+F 3 "" H 9950 3700 50  0001 C CNN
+	1    9950 3700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9950 3650 9950 3700
+$Comp
+L Switch:SW_Push SW3
+U 1 1 5F745B1B
+P 9950 3450
+F 0 "SW3" V 9996 3402 50  0000 R CNN
+F 1 "SW_Push" V 9905 3402 50  0000 R CNN
+F 2 "josh-keyboard:Trackball_Tactile_Switch" H 9950 3650 50  0001 C CNN
+F 3 "~" H 9950 3650 50  0001 C CNN
+	1    9950 3450
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC
