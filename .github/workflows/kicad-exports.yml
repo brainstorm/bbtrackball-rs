@@ -25,15 +25,18 @@ jobs:
       with:
         cmd: schematic
         schematic: hardware/stm32-trackball/stm32_dev.sch
+        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: schematic
     - uses: nerdyscout/kicad-exports@v1.0
       with:
         cmd: kicost
         schematic: hardware/stm32-trackball/stm32_dev.sch
+        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: bom
     - uses: nerdyscout/kicad-exports@v1.0
       with:
         cmd: pcbdraw-front 
+        schematic: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: img
     - uses: nerdyscout/kicad-exports@v1.0
