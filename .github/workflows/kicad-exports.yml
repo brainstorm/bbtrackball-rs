@@ -20,20 +20,20 @@ jobs:
     - uses: nerdyscout/kicad-exports@v1.0
       with:
         cmd: fabrication
-        schematic: hardware/stm32-dev-0.1/stm32_dev.sch
-        board: hardware/stm32-dev-0.1/stm32_dev.kicad_pcb
+        schematic: hardware/stm32-trackball/stm32_dev.sch
+        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: gerbers 
         manufacturer: "jlcpcb"
     - uses: nerdyscout/kicad-exports@v1.0
       with:
         cmd: ibom
-        schematic: hardware/stm32-dev-0.1/stm32_dev.sch
-        board: hardware/stm32-dev-0.1/stm32_dev.kicad_pcb
+        schematic: hardware/stm32-trackball/stm32_dev.sch
+        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: bom
     - name: upload results
       uses: actions/upload-artifact@v2
       with:
         name: gerbers
-        schematic: hardware/stm32-dev-0.1/stm32_dev.sch
-        board: hardware/stm32-dev-0.1/stm32_dev.kicad_pcb
+        schematic: hardware/stm32-trackball/stm32_dev.sch
+        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         path: gerbers
