@@ -1103,7 +1103,7 @@ TB_RIGHT
 Wire Wire Line
 	8850 2700 8400 2700
 $Comp
-L josh-ic:AN48840B U5
+L stm32_dev-rescue:AN48840B-josh-ic U5
 U 1 1 5F41B464
 P 7850 2700
 F 0 "U5" H 7850 3086 59  0000 C CNN
@@ -1494,7 +1494,7 @@ Wire Wire Line
 Wire Wire Line
 	7350 1800 7250 1800
 $Comp
-L josh-ic:AN48840B U4
+L stm32_dev-rescue:AN48840B-josh-ic U4
 U 1 1 5F3F0D61
 P 7850 1900
 F 0 "U4" H 7850 2286 59  0000 C CNN
@@ -1513,7 +1513,7 @@ Wire Wire Line
 Text Label 8850 3500 2    50   ~ 0
 TB_UP
 $Comp
-L josh-ic:AN48840B U6
+L stm32_dev-rescue:AN48840B-josh-ic U6
 U 1 1 5F4240DE
 P 7850 3500
 F 0 "U6" H 7850 3886 59  0000 C CNN
@@ -1554,7 +1554,7 @@ F 3 "" H 7250 3650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L josh-ic:AN48840B U7
+L stm32_dev-rescue:AN48840B-josh-ic U7
 U 1 1 5F42EACE
 P 7850 4250
 F 0 "U7" H 7850 4636 59  0000 C CNN
