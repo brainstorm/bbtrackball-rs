@@ -36,7 +36,7 @@
     (46 B.CrtYd user)
     (47 F.CrtYd user)
     (48 B.Fab user)
-    (49 F.Fab user hide)
+    (49 F.Fab user)
   )
 
   (setup
@@ -69,7 +69,7 @@
     (pad_drill 0.762)
     (pad_to_mask_clearance 0.05)
     (aux_axis_origin 0 0)
-    (visible_elements FFFFFF7F)
+    (visible_elements FFFFFFFF)
     (pcbplotparams
       (layerselection 0x010fc_ffffffff)
       (usegerberextensions false)
@@ -197,7 +197,7 @@
     (descr "Mounting Hole 2.1mm, no annular")
     (tags "mounting hole 2.1mm no annular")
     (attr virtual)
-    (fp_text reference REF** (at 0 -3.2) (layer F.SilkS) hide
+    (fp_text reference mounthole1 (at 0 -3.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_2.1mm (at 0 3.2) (layer F.Fab)
@@ -216,7 +216,7 @@
     (descr "Mounting Hole 2.1mm, no annular")
     (tags "mounting hole 2.1mm no annular")
     (attr virtual)
-    (fp_text reference REF** (at 0 -3.2) (layer F.SilkS) hide
+    (fp_text reference mounthole2 (at 0 -3.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_2.1mm (at 0 3.2) (layer F.Fab)
@@ -235,7 +235,7 @@
     (descr "Mounting Hole 2.1mm, no annular")
     (tags "mounting hole 2.1mm no annular")
     (attr virtual)
-    (fp_text reference REF** (at 0 -3.2) (layer F.SilkS) hide
+    (fp_text reference mounthole_trackball_2 (at 0 -3.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_2.1mm (at 6.8 -4.4) (layer F.Fab) hide
@@ -254,7 +254,7 @@
     (descr "Mounting Hole 2.1mm, no annular")
     (tags "mounting hole 2.1mm no annular")
     (attr virtual)
-    (fp_text reference REF** (at 0 -3.2) (layer F.SilkS) hide
+    (fp_text reference mounthole_trackball_1 (at 0 -3.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_2.1mm (at 3.2 -4.1) (layer F.Fab) hide
@@ -273,7 +273,7 @@
     (descr "Mounting Hole 2.1mm, no annular")
     (tags "mounting hole 2.1mm no annular")
     (attr virtual)
-    (fp_text reference REF** (at 0 -3.2) (layer F.SilkS) hide
+    (fp_text reference mounthole_trackball_4 (at 0 -3.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_2.1mm (at 0 3.2) (layer F.Fab) hide
@@ -292,7 +292,7 @@
     (descr "Mounting Hole 2.1mm, no annular")
     (tags "mounting hole 2.1mm no annular")
     (attr virtual)
-    (fp_text reference REF** (at 0 -3.2) (layer F.SilkS) hide
+    (fp_text reference mounthole_trackball_3 (at 0 -3.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_2.1mm (at 0 3.2) (layer F.Fab) hide
@@ -2310,10 +2310,10 @@
   (module SparkFun_Blackberry_Trackballer_Breakout_v13:CREATIVE_COMMONS (layer Top) (tedit 0) (tstamp 5EF47698)
     (at 191.678979 136.3186)
     (path /73DA64CA)
-    (fp_text reference FRAME1 (at 0 0) (layer F.SilkS) hide
+    (fp_text reference FRAME1 (at 0.141021 -2.1586) (layer F.SilkS) hide
       (effects (font (size 1.27 1.27) (thickness 0.15)))
     )
-    (fp_text value FRAME-LETTER (at 0 0) (layer F.SilkS) hide
+    (fp_text value FRAME-LETTER2 (at 0.131021 2.5914) (layer F.SilkS) hide
       (effects (font (size 1.27 1.27) (thickness 0.15)))
     )
   )
@@ -2321,10 +2321,10 @@
   (module SparkFun_Blackberry_Trackballer_Breakout_v13:CREATIVE_COMMONS (layer Top) (tedit 0) (tstamp 5EF47698)
     (at 191.828979 136.3686)
     (path /73DA64CA)
-    (fp_text reference FRAME1 (at 0 0) (layer F.SilkS) hide
+    (fp_text reference FRAME2 (at 7.251021 -2.2886) (layer F.SilkS) hide
       (effects (font (size 1.27 1.27) (thickness 0.15)))
     )
-    (fp_text value FRAME-LETTER (at 0 0) (layer F.SilkS) hide
+    (fp_text value FRAME-LETTER1 (at 0 0) (layer F.SilkS) hide
       (effects (font (size 1.27 1.27) (thickness 0.15)))
     )
   )
