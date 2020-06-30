@@ -523,9 +523,9 @@ nLED_WHT
 Text Label 6250 3100 2    50   ~ 0
 TB_LEFT
 Text Label 6250 3200 2    50   ~ 0
-TB_RIGHT
-Text Label 6250 3300 2    50   ~ 0
 TB_UP
+Text Label 6250 3300 2    50   ~ 0
+TB_RIGHT
 Text Label 6250 3400 2    50   ~ 0
 TB_DOWN
 Text Label 6250 3600 2    50   ~ 0
@@ -708,7 +708,7 @@ nLED_WHT
 Text Label 6000 5750 0    50   ~ 0
 TB_LEFT
 Text Label 6000 5850 0    50   ~ 0
-TB_RIGHT
+TB_UP
 Text Label 6000 6050 0    50   ~ 0
 TB_DOWN
 Wire Wire Line
@@ -944,7 +944,7 @@ Wire Wire Line
 Wire Wire Line
 	6000 5950 6500 5950
 Text Label 6000 5950 0    50   ~ 0
-TB_UP
+TB_RIGHT
 $Comp
 L power:GND #PWR0112
 U 1 1 5F2B51E4
@@ -988,7 +988,7 @@ nLED_WHT
 Text Label 7900 5750 2    50   ~ 0
 TB_LEFT
 Text Label 7900 5850 2    50   ~ 0
-TB_RIGHT
+TB_UP
 Text Label 7900 6050 2    50   ~ 0
 TB_DOWN
 Wire Wire Line
@@ -1045,7 +1045,7 @@ Wire Wire Line
 Wire Wire Line
 	7900 5950 7400 5950
 Text Label 7900 5950 2    50   ~ 0
-TB_UP
+TB_RIGHT
 Text Notes 1950 850  0    197  ~ 0
 STM32F042 Development
 Text Notes 7800 850  0    197  ~ 0
