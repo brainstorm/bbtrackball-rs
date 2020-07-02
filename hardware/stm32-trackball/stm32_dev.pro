@@ -1,4 +1,4 @@
-update=20/11/2019 08:42:07
+update=Thu 02 Jul 2020 23:22:30
 version=1
 last_client=kicad
 [general]
@@ -12,6 +12,16 @@ NetIExt=net
 version=1
 LibDir=
 [eeschema/libraries]
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceAjustPassiveValues=0
+LabSize=50
+ERC_TestSimilarLabels=1
 [pcbnew]
 version=1
 PageLayoutDescrFile=
@@ -22,7 +32,7 @@ AllowMicroVias=0
 AllowBlindVias=0
 RequireCourtyardDefinitions=0
 ProhibitOverlappingCourtyards=1
-MinTrackWidth=0.15
+MinTrackWidth=0.2
 MinViaDiameter=0.5
 MinViaDrill=0.25
 MinMicroViaDiameter=0.2
@@ -32,14 +42,16 @@ TrackWidth1=0.25
 TrackWidth2=0.2
 TrackWidth3=0.3
 TrackWidth4=0.4
-ViaDiameter1=0.5
-ViaDrill1=0.25
-ViaDiameter2=0.6
-ViaDrill2=0.3
+ViaDiameter1=0.8
+ViaDrill1=0.4
+ViaDiameter2=0.5
+ViaDrill2=0.25
+ViaDiameter3=0.6
+ViaDrill3=0.3
 dPairWidth1=0.2
 dPairGap1=0.25
 dPairViaGap1=0.25
-SilkLineWidth=0.15
+SilkLineWidth=0.12
 SilkTextSizeV=1
 SilkTextSizeH=1
 SilkTextSizeThickness=0.15
@@ -51,7 +63,7 @@ CopperTextSizeH=1.5
 CopperTextThickness=0.3
 CopperTextItalic=0
 CopperTextUpright=1
-EdgeCutLineWidth=0.09999999999999999
+EdgeCutLineWidth=0.05
 CourtyardLineWidth=0.05
 OthersLineWidth=0.15
 OthersTextSizeV=1
@@ -64,7 +76,7 @@ SolderMaskMinWidth=0
 SolderPasteClearance=0
 SolderPasteRatio=-0
 [pcbnew/Layer.F.Cu]
-Name=F.Cu
+Name=Top
 Type=0
 Enabled=1
 [pcbnew/Layer.In1.Cu]
@@ -188,7 +200,7 @@ Name=In30.Cu
 Type=0
 Enabled=0
 [pcbnew/Layer.B.Cu]
-Name=B.Cu
+Name=Bottom
 Type=0
 Enabled=1
 [pcbnew/Layer.B.Adhes]
@@ -234,8 +246,8 @@ Enabled=0
 Name=Default
 Clearance=0.2
 TrackWidth=0.25
-ViaDiameter=0.5
-ViaDrill=0.25
+ViaDiameter=0.8
+ViaDrill=0.4
 uViaDiameter=0.3
 uViaDrill=0.1
 dPairWidth=0.2
