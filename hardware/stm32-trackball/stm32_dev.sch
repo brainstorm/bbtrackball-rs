@@ -1721,4 +1721,35 @@ F 3 "" H 2000 3900 50  0001 C CNN
 	1    2000 3900
 	1    0    0    -1  
 $EndComp
+NoConn ~ 4350 2850
+NoConn ~ 4350 2950
+NoConn ~ 4350 3150
+NoConn ~ 4350 3250
+NoConn ~ 4350 3350
+NoConn ~ 4350 3450
+NoConn ~ 4350 3550
+NoConn ~ 4350 3650
+NoConn ~ 5650 3650
+$Comp
+L Graphic:Logo_Open_Hardware_Small LOGO1
+U 1 1 5F0931D3
+P 5900 6150
+F 0 "LOGO1" H 5900 6425 50  0001 C CNN
+F 1 "OSHW Mask" H 5900 5925 50  0001 C CNN
+F 2 "josh-logos:OSHW_Logo_3.6x3.6_F.Mask" H 5900 6150 50  0001 C CNN
+F 3 "~" H 5900 6150 50  0001 C CNN
+	1    5900 6150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Graphic:Logo_Open_Hardware_Small LOGO2
+U 1 1 5F090374
+P 6400 6150
+F 0 "LOGO2" H 6400 6425 50  0001 C CNN
+F 1 "Board Details" H 6400 5925 50  0001 C CNN
+F 2 "josh-logos:board-title" H 6400 6150 50  0001 C CNN
+F 3 "~" H 6400 6150 50  0001 C CNN
+	1    6400 6150
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
