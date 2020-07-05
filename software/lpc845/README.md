@@ -17,3 +17,8 @@ $ cargo flash --chip=LPC845M301JBD48
 ```
 
 No need for OpenOCD :)
+
+# TODO
+
+* Substitute current simple "active wait" approach [with interrupts](https://github.com/lpc-rs/lpc8xx-hal/blob/master/examples/pinint.rs).
+* Add in V-USB [Mouse HID](https://crates.io/crates/usbd-hid-device).
