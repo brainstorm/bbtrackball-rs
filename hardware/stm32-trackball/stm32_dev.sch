@@ -2095,4 +2095,15 @@ Wire Wire Line
 Connection ~ 10950 1950
 Wire Wire Line
 	10950 1950 10950 2000
+$Comp
+L Mechanical:MountingHole H10
+U 1 1 5F0266C3
+P 5100 5850
+F 0 "H10" H 5200 5896 50  0000 L CNN
+F 1 "Title" H 5200 5805 50  0000 L CNN
+F 2 "josh-logos:board-title" H 5100 5850 50  0001 C CNN
+F 3 "~" H 5100 5850 50  0001 C CNN
+	1    5100 5850
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
