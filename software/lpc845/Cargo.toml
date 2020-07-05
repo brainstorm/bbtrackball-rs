@@ -1,0 +1,11 @@
+[package]
+name = "lpc845"
+version = "0.1.0"
+authors = ["Hanno Braun <hanno@braun-embedded.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lpc8xx-hal = { version = "0.7", features = ["845-rt"] }
+panic-halt = "0.2"
