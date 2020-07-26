@@ -1,9 +1,2 @@
-[default.rtt]
-enabled = true
-
-[stm32f04.probe]
-usb_vid = "0483"
-usb_pid = "df11"
-
-[stm32f04.general]
+[default.general]
 chip = "STM32F042G6Ux"

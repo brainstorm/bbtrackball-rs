@@ -35,7 +35,7 @@ fn main() -> ! {
     let mut led = cortex_m::interrupt::free(|cs| {
         gpiob.pb3.into_push_pull_output(cs)
     });
-    led.set_low(); // Turn off
+    led.set_low().unwrap(); // Turn off
 
     let gpioa = dp.GPIOA.split(&mut rcc);
 
@@ -62,7 +62,7 @@ fn main() -> ! {
 
         match serial.read(&mut buf) {
             Ok(count) if count > 0 => {
-                led.set_high(); // Turn on
+                led.set_high().unwrap(); // Turn on
 
                 // Echo back in upper case
                 for c in buf[0..count].iter_mut() {
@@ -84,6 +84,6 @@ fn main() -> ! {
             _ => {}
         }
 
-        led.set_low(); // Turn off
+        led.set_low().unwrap(); // Turn off
     }
 }
