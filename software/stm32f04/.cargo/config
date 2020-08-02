@@ -1,7 +1,5 @@
 [target.thumbv6m-none-eabi]
-runner = "arm-none-eabi-gdb -q -x openocd.gdb"
 rustflags = [
-  "-C", "linker=rust-lld",
   "-C", "link-arg=-Tlink.x",
 ]
 

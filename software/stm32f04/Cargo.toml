@@ -1,14 +1,19 @@
 [package]
 name = "stm32f042"
 version = "0.1.0"
-authors = ["Vadim Kaushan <admin@disasm.info>"]
+authors = ["Roman Valls Guimera <brainstorm@nopcode.org>"]
 edition = "2018"
 
 [dependencies]
-cortex-m = "0.6"
-cortex-m-rt = "0.6"
-stm32f0xx-hal = { version = "0.15.2", features = ["rt", "stm32f042"] }
+embedded-hal = "0.2.4"
+usb-device = "0.2.5"
+usbd-serial = "0.1.0"
+usbd-hid-device = "0.1.1"
 panic-semihosting = "0.5"
-usb-device = "0.2.1"
-usbd-serial = "0.1"
-stm32-usbd = { version = "0.4.0", features = ["stm32f042xx"] }
+cortex-m = "0.6.3"
+cortex-m-rt = {version = "0.6.12", features = [ "device" ] }
+stm32f0xx-hal = { version = "0.17.0", features = ["rt", "stm32f042", "stm32-usbd"] }
+stm32-usbd = { version = "0.5.1", features = ["ram_access_2x16"] }
+
+[build]
+target = "thumbv6m-none-eabi"
