@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "software/stm32f04",
+    ]
