@@ -1,94 +1,142 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_semihosting;
-use cortex_m::peripheral::Peripherals as Cortex_Peripherals;
-use cortex_m_rt::entry;
-use usb_device::prelude::*;
-//use usbd_serial::{SerialPort, USB_CLASS_CDC};
-use usbd_serial::USB_CLASS_CDC;
+use panic_semihosting as _;
+use rtic::app;
 
 use stm32f0xx_hal::{
-    delay::Delay,
-    pac::Peripherals, //, interrupt, Interrupt},
     prelude::*,
-    usb::{Peripheral, UsbBus},
+    pac,
+    usb,
 };
 
-mod report;
+use usb_device::prelude::*;
+use usb_device::bus::UsbBusAllocator;
+use usbd_serial::{SerialPort, USB_CLASS_CDC};
 
-// const SENSITIVITY: i16 = 128;
+mod hid;
+mod trackball;
+mod button_scanner;
 
-#[entry]
-fn main() -> ! {
-    let mut p = Peripherals::take().unwrap();
-    let cp = Cortex_Peripherals::take().unwrap();
 
-    let mut rcc = p
-        .RCC
-        .configure()
-        .hsi48()
-        .enable_crs(p.CRS)
-        .sysclk(48.mhz())
-        .pclk(24.mhz())
-        .freeze(&mut p.FLASH);
+#[app(device = stm32f0xx_hal::pac, peripherals = true)]
+const APP: () = {
+    struct Resources {
+        usb_bus: &'static UsbBusAllocator<usb::UsbBusType>,
+        usb_serial: usbd_serial::SerialPort<'static, usb::UsbBusType>,
+        usb_device: UsbDevice<'static, usb::UsbBusType>,
+        usb_trackball: hid::HidClass<'static, usb::UsbBusType, trackball::Trackball>,
+        //scanner: Scanner<Pxx<Input<PullDown>>, Pxx<Output<PushPull>>>,
+    }
 
-    // Get delay provider
-    let mut delay = Delay::new(cp.SYST, &rcc);
+    #[init]
+    fn init(ctx: init::Context) -> init::LateResources {
+        static mut USB_BUS: Option<UsbBusAllocator<usb::UsbBusType>> = None;
 
-    // Configure the on-board I/O: LEDs, spare buttons and hall sensors
-    // ..."split() takes the raw peripheral struct from the PAC
-    // and converts it into a struct that provides separate access and ownership for each GPIO pin"
-    // https://craigjb.com/2019/12/31/stm32l0-rust/
+        // Alias peripherals
+        let mut dp: pac::Peripherals = ctx.device;
 
-    // USR LED and Buttons
-    let gpiob = p.GPIOB.split(&mut rcc);
-    let (mut usr_led, mut _button3, mut _button4, mut _button5) = cortex_m::interrupt::free(|cs| {
-        (
-            gpiob.pb1.into_push_pull_output(cs),
-            gpiob.pb5.into_pull_up_input(cs),
-            gpiob.pb4.into_pull_up_input(cs),
-            gpiob.pb3.into_pull_up_input(cs),
-        )
-    });
+        // Set up core registers
+        // let mut rcc = dp.RCC
+        //     .configure()
+        //     .hse(8.mhz(), stm32f0xx_hal::rcc::HSEBypassMode::NotBypassed)
+        //     .sysclk(72.mhz())
+        //     .pclk(24.mhz())
+        //     .freeze(&mut dp.FLASH);
 
-    // LEDs and USB
-    let gpioa = p.GPIOA.split(&mut rcc);
-    let (mut bbled_red, mut bbled_grn, mut bbled_blu, mut bbled_wht, pin_dm, pin_dp) =
-        cortex_m::interrupt::free(|cs| {
+        // assert!(rcc.clocks. usbclk_valid());
+        let mut rcc = dp
+            .RCC
+            .configure()
+            //.usbsrc(USBClockSource::)
+            .hsi48()
+            .enable_crs(dp.CRS)
+            .sysclk(48.mhz())
+            .pclk(24.mhz())
+            .freeze(&mut dp.FLASH);
+        
+        //assert!(rcc.usbclk_valid());
+
+
+        // Set up GPIO registers
+        // USR LED and Buttons
+        let gpiob = dp.GPIOB.split(&mut rcc);
+        let (mut usr_led, mut _button3, mut _button4, mut _button5) = cortex_m::interrupt::free(|cs| {
             (
-                gpioa.pa1.into_push_pull_output(cs),
-                gpioa.pa2.into_push_pull_output(cs),
-                gpioa.pa3.into_push_pull_output(cs),
-                gpioa.pa4.into_push_pull_output(cs),
-                gpioa.pa11,
-                gpioa.pa12,
+                gpiob.pb1.into_push_pull_output(cs),
+                gpiob.pb5.into_pull_up_input(cs),
+                gpiob.pb4.into_pull_up_input(cs),
+                gpiob.pb3.into_pull_up_input(cs),
             )
         });
 
-    usr_led.set_low().ok(); // Turn off
+        // LEDs and USB
+        let gpioa = dp.GPIOA.split(&mut rcc);
+        let (mut bbled_red, mut bbled_grn, mut bbled_blu, mut bbled_wht, usb_dm, usb_dp) =
+            cortex_m::interrupt::free(|cs| {
+                (
+                    gpioa.pa1.into_push_pull_output(cs),
+                    gpioa.pa2.into_push_pull_output(cs),
+                    gpioa.pa3.into_push_pull_output(cs),
+                    gpioa.pa4.into_push_pull_output(cs),
+                    gpioa.pa11,
+                    gpioa.pa12,
+                )
+            });
 
-    let usb_bus = UsbBus::new(Peripheral {
-        usb: p.USB,
-        pin_dm: pin_dm,
-        pin_dp: pin_dp,
-    });
+        // XXX: Use suitable (new) functions for delay
+        //asm::delay(clocks.sysclk().0 / 100);
 
-    // Define USB device
-    let mut _usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x16c0, 0x27dd))
-        .manufacturer("JoshFTW")
-        .product("BBTrackball")
-        .serial_number("RustFW")
-        .device_class(USB_CLASS_CDC)
-        .build();
+        let usb = usb::Peripheral {
+            usb: dp.USB,
+            pin_dm: usb_dm,
+            pin_dp: usb_dp,
+        };
 
-    loop {
-        usr_led.toggle().ok();
-        bbled_blu.toggle().ok();
-        bbled_grn.toggle().ok();
-        bbled_red.toggle().ok();
-        bbled_wht.toggle().ok();
+        let (usb_serial, usb_trackball, usb_device) = {
+            *USB_BUS = Some(usb::UsbBus::new(usb));
+            let serial = SerialPort::new(USB_BUS.as_ref().unwrap());
 
-        delay.delay_ms(1000u32);
+            let trackball = hid::HidClass::new(trackball::Trackball::new(), USB_BUS.as_ref().unwrap());
+
+            let usb_dev = UsbDeviceBuilder::new(
+                        USB_BUS.as_ref().unwrap(),
+                        UsbVidPid(0x16c0, 0x27dd)
+                    )
+                .manufacturer("JoshFTW")
+                .product("BBTrackball")
+                .serial_number("RustFW")
+                .device_class(USB_CLASS_CDC)
+                .build();
+
+            (serial, trackball, usb_dev)
+        };
+
+        // Set up button scanner
+        // let scanner = Scanner::new(
+        //         [
+        //             gpiob.pb12.into_pull_down_input(&mut gpiob.crh).downgrade(),
+        //             gpiob.pb13.into_pull_down_input(&mut gpiob.crh).downgrade(),
+        //             gpiob.pb14.into_pull_down_input(&mut gpiob.crh).downgrade(),
+        //             gpiob.pb15.into_pull_down_input(&mut gpiob.crh).downgrade(),
+        //         ],
+        //         [
+        //             gpiob.pb11.into_push_pull_output(&mut gpiob.crh).downgrade(),
+        //             gpiob.pb10.into_push_pull_output(&mut gpiob.crh).downgrade(),
+        //             gpiob.pb1.into_push_pull_output(&mut gpiob.crl).downgrade(),
+        //             gpiob.pb0.into_push_pull_output(&mut gpiob.crl).downgrade(),
+        //             gpioa.pa7.into_push_pull_output(&mut gpioa.crl).downgrade(),
+        //             gpioa.pa6.into_push_pull_output(&mut gpioa.crl).downgrade(),
+        //         ]
+        //     );
+
+
+        init::LateResources {
+            usb_bus: USB_BUS.as_ref().unwrap(),
+            usb_serial,
+            usb_device,
+            usb_trackball,
+            //scanner
+        }
     }
-}
+};
