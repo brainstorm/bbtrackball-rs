@@ -10,7 +10,11 @@ usb-device = "0.2.5"
 usbd-serial = "0.1.0"
 usbd-hid-device = "0.1.1"
 panic-semihosting = "0.5"
+rtt-target = { version = "0.2.0", features = ["cortex-m"] }
+panic-halt = "0.2.0"
+panic-rtt-target = { version = "0.1.0", features = ["cortex-m"] }
 cortex-m = "0.6.3"
+cortex-m-semihosting = "0.3.5"
 cortex-m-rtic = { version = "0.5.3" }
 stm32f0xx-hal = { version = "0.17.0", features = ["rt", "stm32f042", "stm32-usbd"] }
 stm32-usbd = { version = "0.5.1", features = ["ram_access_2x16"] }

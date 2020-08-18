@@ -5,7 +5,7 @@ macro_rules! define_scanner {
             inputs: [I; $inputs],
             outputs: [O; $outputs],
             // Time since last change on pin. Used for debouncing
-            last_activity: [u32; $inputs],
+            pub last_activity: [u32; $inputs],
         }
 
         impl<I, O> $name<I, O>
@@ -28,7 +28,7 @@ macro_rules! define_scanner {
 
               Panics if result_buffer.len()*8 < inputs*outputs
             */
-            pub fn scan_to_bytes(&mut self, result_buffer: &mut [u8], time: u32) {
+            pub fn scan_to_bytes(&mut self, result_buffer: &mut [u8]) {
                 for byte in result_buffer.iter_mut() {
                     *byte = 0;
                 }
@@ -36,7 +36,7 @@ macro_rules! define_scanner {
                 let mut buff_offset = 0;
                 for output in &mut self.outputs {
                     output.set_high().unwrap();
-                    asm::delay(100);
+                    //XXX: asm::delay(100);
                     for input in &self.inputs {
                         if input.is_high().unwrap() {
                             result_buffer[buff_index] |= 1 << buff_offset;
