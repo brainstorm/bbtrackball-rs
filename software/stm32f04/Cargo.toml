@@ -8,7 +8,7 @@ edition = "2018"
 embedded-hal = "0.2.4"
 usb-device = "0.2.5"
 usbd-serial = "0.1.0"
-usbd-hid-device = "0.1.1"
+usbd-hid = "0.4.4"
 panic-semihosting = "0.5"
 rtt-target = { version = "0.2.0", features = ["cortex-m"] }
 panic-halt = "0.2.0"
