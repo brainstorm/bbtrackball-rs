@@ -5,6 +5,7 @@
 
 use panic_halt as _;
 use rtt_target::{rtt_init_print, rprintln};
+//use core::sync::atomic::{compiler_fence, Ordering};
 use rtic::app;
 
 use stm32f0xx_hal::{
@@ -104,16 +105,9 @@ const APP: () = {
 
         // "I don't think that particular HAL has any helper functions to deal with setting up gpio exti interrupts yet, 
         // so you'll have to do modify the registers directly through the PAC..."
-        
-        // Enable external interrupt for PB1
-        dp.SYSCFG.exticr1.modify(|_, w| unsafe { w.exti1().bits(1) });
-        // Set interrupt mask for line 1
-        dp.EXTI.imr.modify(|_, w| w.mr1().set_bit());
-        // Set interrupt rising trigger for line 1
-        dp.EXTI.rtsr.modify(|_, w| w.tr1().set_bit());
 
-        // Enable external interrupt for PB15? PA15?
-        dp.SYSCFG.exticr4.modify(|_, w| unsafe { w.exti15().bits(1) });
+        // Enable external interrupt for PA15 (button)
+        dp.SYSCFG.exticr4.modify(|_, w| { w.exti15().pa15() });
         // Set interrupt mask for line 15
         dp.EXTI.imr.modify(|_, w| w.mr15().set_bit());
         // Set interrupt rising trigger for line 15
@@ -172,7 +166,7 @@ const APP: () = {
 
     #[idle(resources = [usb_serial])]
     fn idle(_: idle::Context) -> ! {
-        loop { continue };
+        loop { cortex_m::asm::wfi(); };
     }
 
     #[task(binds = USB, resources = [usb_device, usb_serial])]
@@ -195,7 +189,10 @@ const APP: () = {
     #[task(binds = EXTI4_15, resources = [exti, usr_led, button3, button4, button5])]
     fn gpioa(ctx: gpioa::Context) {
         let _usr_led = ctx.resources.usr_led;
-        rprintln!("Interrupts happening on EXTI4_15... pins from 4 to 15? PA OR PB? GPIOA or GPIOB?");
+        rprintln!("Interrupts happening on EXTI for PB15...");
+        
+        // Clear the interrupt pending bit for line 4
+        ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
     }
 
     extern "C" {
