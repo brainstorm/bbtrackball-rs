@@ -189,16 +189,11 @@ const APP: () = {
     #[task(binds = EXTI4_15, resources = [exti, usr_led, button3, button4, button5])]
     fn gpioa(ctx: gpioa::Context) {
         let _usr_led = ctx.resources.usr_led;
-        rprintln!("Interrupts happening on EXTI for PB15...");
+        rprintln!("Interrupts happening on EXTI for PA15...");
         
-        // Clear the interrupt pending bit for line 4
-        ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
+        // Clear interrupt
+        ctx.resources.exti.pr.write(|w| w.pif15().set_bit());
     }
-
-    extern "C" {
-        fn CEC_CAN();
-    }
-
 };
 
 fn usb_poll<B: usb_device::bus::UsbBus>(
