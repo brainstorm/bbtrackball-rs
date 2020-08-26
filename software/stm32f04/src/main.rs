@@ -13,8 +13,8 @@ use stm32f0xx_hal::{
     pac,
     usb,
     gpio::{ Input, Output, PushPull, PullUp },
-    gpio::gpiob:: { PB1, PB5, PB4, PB3 },
-    gpio::gpioa::{ PA1, PA2, PA3, PA4 },
+    gpio::gpiob:: { PB1, PB4, PB3 },
+    gpio::gpioa::{ PA1, PA2, PA3, PA4, PA15 },
 };
 
 use usb_device::prelude::*;
@@ -39,7 +39,7 @@ const APP: () = {
         usb_device: UsbDevice<'static, usb::UsbBusType>,
         exti: pac::EXTI,
         usr_led: PB1<Output<PushPull>>,
-        button3: PB5<Input<PullUp>>,
+        button3: PA15<Input<PullUp>>,
         button4: PB4<Input<PullUp>>,
         button5: PB3<Input<PullUp>>,
         bbled_red: PA1<Output<PushPull>>,
@@ -79,10 +79,9 @@ const APP: () = {
 
         // Set up GPIO registers for USR LED and Buttons
         let gpiob = dp.GPIOB.split(&mut rcc);
-        let (usr_led, button3, button4, button5) = disable_interrupts (|cs| {
+        let (usr_led, button4, button5) = disable_interrupts (|cs| {
             (
                 gpiob.pb1.into_push_pull_output(cs),
-                gpiob.pb5.into_pull_up_input(cs),
                 gpiob.pb4.into_pull_up_input(cs),
                 gpiob.pb3.into_pull_up_input(cs),
             )
@@ -90,13 +89,14 @@ const APP: () = {
 
         // LEDs and USB
         let gpioa = dp.GPIOA.split(&mut rcc);
-        let (bbled_red, bbled_grn, bbled_blu, bbled_wht, usb_dm, usb_dp) =
+        let (bbled_red, bbled_grn, bbled_blu, bbled_wht, button3, usb_dm, usb_dp) =
             disable_interrupts (|cs| {
                 (
                     gpioa.pa1.into_push_pull_output(cs),
                     gpioa.pa2.into_push_pull_output(cs),
                     gpioa.pa3.into_push_pull_output(cs),
                     gpioa.pa4.into_push_pull_output(cs),
+                    gpioa.pa15.into_pull_up_input(cs),
                     gpioa.pa11,
                     gpioa.pa12,
                 )
@@ -106,12 +106,20 @@ const APP: () = {
         // "I don't think that particular HAL has any helper functions to deal with setting up gpio exti interrupts yet, 
         // so you'll have to do modify the registers directly through the PAC..."
 
-        // Enable external interrupt for PA15 (button)
+        // Enable external interrupt for PA15 and other buttons
         dp.SYSCFG.exticr4.modify(|_, w| { w.exti15().pa15() });
-        // Set interrupt mask for line 15
+        dp.SYSCFG.exticr2.modify(|_, w| { w.exti4().pb4() });
+        dp.SYSCFG.exticr1.modify(|_, w| { w.exti3().pb3() });
+
+        // Set interrupt mask for line 15, 4 and 3
         dp.EXTI.imr.modify(|_, w| w.mr15().set_bit());
-        // Set interrupt rising trigger for line 15
+        dp.EXTI.imr.modify(|_, w| w.mr4().set_bit());
+        dp.EXTI.imr.modify(|_, w| w.mr3().set_bit());
+
+        // Set interrupt rising trigger for line 15, 4 and 3
         dp.EXTI.rtsr.modify(|_, w| w.tr15().set_bit());
+        dp.EXTI.rtsr.modify(|_, w| w.tr4().set_bit());
+        dp.EXTI.rtsr.modify(|_, w| w.tr3().set_bit());
 
         let usb = usb::Peripheral {
             usb: dp.USB,
@@ -169,31 +177,44 @@ const APP: () = {
         loop { cortex_m::asm::wfi(); };
     }
 
+    #[task(binds = EXTI2_3, resources = [exti])]
+    fn twotothree(ctx: twotothree::Context) {
+        rprintln!("Interrupts happening on EXTI2_3");
+
+        match ctx.resources.exti.pr.read().bits() {
+            0x4 => {
+                rprintln!("PB3 triggered");
+                ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
+            },
+
+            _ => rprintln!("Some other bits were pushed around on EXTI2_3 ;)"),
+        }
+    }
+    
+    #[task(binds = EXTI4_15, resources = [exti])]
+    fn gpioa(ctx: gpioa::Context) {
+        rprintln!("Interrupts happening on EXTI for PA15...");
+        
+        match ctx.resources.exti.pr.read().bits() {
+            //0x4000 => {
+            0x8000 => {
+                rprintln!("PA15 triggered");
+                ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
+            },
+            0x8 => {
+                rprintln!("PB4 triggered");
+                ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
+            },
+            _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
+        }
+    }
     #[task(binds = USB, resources = [usb_device, usb_serial])]
     fn usbrx(ctx: usbrx::Context) {
         usb_poll(ctx.resources.usb_device, ctx.resources.usb_serial);
     }
 
-    #[task(binds = EXTI0_1, resources = [exti, usr_led, button3, button4, button5])]
-    fn zerotoone(ctx: zerotoone::Context) {
-        rprintln!("Interrupts happening on EXTI0_1");
-        // Clear the interrupt pending bit for line 1
-        ctx.resources.exti.pr.write(|w| w.pif1().set_bit());
-    }
-
-    // #[task(binds = EXTI2_3)]
-    // fn twotothree(_: twotothree::Context) {
-    //     rprintln!("Interrupts happening on EXTI2_3");
-    // }
-    
-    #[task(binds = EXTI4_15, resources = [exti, usr_led, button3, button4, button5])]
-    fn gpioa(ctx: gpioa::Context) {
-        let _usr_led = ctx.resources.usr_led;
-        rprintln!("Interrupts happening on EXTI for PA15...");
-        
-        // Clear interrupt
-        ctx.resources.exti.pr.write(|w| w.pif15().set_bit());
-    }
+    // XXX: Not entirely sure this works for STM32F042?
+    //defmt::info!("Hello, world!");
 };
 
 fn usb_poll<B: usb_device::bus::UsbBus>(
