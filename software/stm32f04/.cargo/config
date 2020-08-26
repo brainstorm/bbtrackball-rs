@@ -4,4 +4,7 @@ rustflags = [
 ]
 
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
-runner = "probe-run --chip --defmt"
+runner = "probe-run --chip STM32F042G6Ux --defmt"
+
+[build]
+target = "thumbv6m-none-eabi"
