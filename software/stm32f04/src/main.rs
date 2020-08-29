@@ -107,19 +107,23 @@ const APP: () = {
         // so you'll have to do modify the registers directly through the PAC..."
 
         // Enable external interrupt for PA15 and other buttons
-        dp.SYSCFG.exticr4.modify(|_, w| { w.exti15().pa15() });
-        dp.SYSCFG.exticr2.modify(|_, w| { w.exti4().pb4() });
-        dp.SYSCFG.exticr1.modify(|_, w| { w.exti3().pb3() });
+        dp.SYSCFG.exticr4.write(|w| { w.exti15().pa15() });
+        dp.SYSCFG.exticr2.write(|w| { w.exti4().pb4() });
+        dp.SYSCFG.exticr1.write(|w| { w.exti3().pb3() });
 
         // Set interrupt mask for line 15, 4 and 3
-        dp.EXTI.imr.modify(|_, w| w.mr15().set_bit());
-        dp.EXTI.imr.modify(|_, w| w.mr4().set_bit());
-        dp.EXTI.imr.modify(|_, w| w.mr3().set_bit());
+        dp.EXTI.imr.write(|w| {
+            w.mr3().set_bit();
+            w.mr4().set_bit();
+            w.mr15().set_bit()
+        });
 
         // Set interrupt rising trigger for line 15, 4 and 3
-        dp.EXTI.rtsr.modify(|_, w| w.tr15().set_bit());
-        dp.EXTI.rtsr.modify(|_, w| w.tr4().set_bit());
-        dp.EXTI.rtsr.modify(|_, w| w.tr3().set_bit());
+        dp.EXTI.rtsr.write(|w| {
+            w.tr3().set_bit();
+            w.tr4().set_bit();
+            w.tr15().set_bit()
+        });
 
         let usb = usb::Peripheral {
             usb: dp.USB,
@@ -182,8 +186,16 @@ const APP: () = {
         rprintln!("Interrupts happening on EXTI2_3");
 
         match ctx.resources.exti.pr.read().bits() {
+            0x3 => {
+                rprintln!("PB3 roundabouts on 3");
+                ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
+            },
             0x4 => {
                 rprintln!("PB3 triggered");
+                ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
+            },
+            0x5 => {
+                rprintln!("PB3 roundabouts on 5");
                 ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
             },
 
