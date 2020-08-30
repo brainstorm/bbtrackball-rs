@@ -114,9 +114,9 @@ const APP: () = {
         // so you'll have to do modify the registers directly through the PAC..."
 
         // Enable external interrupt for 3 aux buttons...
-        dp.SYSCFG.exticr4.write(|w| { w.exti15().pa15() });
-        dp.SYSCFG.exticr2.write(|w| { w.exti4().pb4() });
         dp.SYSCFG.exticr1.write(|w| { w.exti3().pb3() });
+        // dp.SYSCFG.exticr2.write(|w| { w.exti4().pb4() }); // Disable spare button in favor of tb_left
+        dp.SYSCFG.exticr4.write(|w| { w.exti15().pa15() });
         //... and for pulses on trackball
         dp.SYSCFG.exticr2.write(|w| { w.exti4().pa4() });
         dp.SYSCFG.exticr2.write(|w| { w.exti5().pa5() });
@@ -141,12 +141,6 @@ const APP: () = {
             w.tr6().set_bit();
             w.tr7().set_bit();
             w.tr15().set_bit()
-        });
-
-        // And use the falling edge to try to disambiguate between pulses from
-        // buttons and trackball (PA0 vs PB0 and PA4 vs PB4)
-        dp.EXTI.ftsr.write(|w| {
-            w.tr4().set_bit()
         });
 
         let usb = usb::Peripheral {
