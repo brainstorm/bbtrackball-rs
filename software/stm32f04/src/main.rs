@@ -143,6 +143,12 @@ const APP: () = {
             w.tr15().set_bit()
         });
 
+        // And use the falling edge to try to disambiguate between pulses from
+        // buttons and trackball (PA0 vs PB0 and PA4 vs PB4)
+        dp.EXTI.ftsr.write(|w| {
+            w.tr4().set_bit()
+        });
+
         let usb = usb::Peripheral {
             usb: dp.USB,
             pin_dm: usb_dm,
