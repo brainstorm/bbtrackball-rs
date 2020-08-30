@@ -13,7 +13,7 @@ use stm32f0xx_hal::{
     usb,
     gpio::{ Input, Output, PushPull, PullUp },
     gpio::gpiob:: { PB1, PB4, PB3 },
-    gpio::gpioa::{ PA1, PA2, PA3, PA4, PA15 },
+    gpio::gpioa::{ PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7, PA15 },
 };
 
 use usb_device::prelude::*;
@@ -41,10 +41,14 @@ const APP: () = {
         button3: PA15<Input<PullUp>>,
         button4: PB4<Input<PullUp>>,
         button5: PB3<Input<PullUp>>,
-        bbled_red: PA1<Output<PushPull>>,
-        bbled_grn: PA2<Output<PushPull>>,
-        bbled_blu: PA3<Output<PushPull>>,
-        bbled_wht: PA4<Output<PushPull>>,
+        tb_left: PA4<Input<PullUp>>,
+        tb_up: PA5<Input<PullUp>>,
+        tb_right: PA6<Input<PullUp>>,
+        tb_down: PA7<Input<PullUp>>,
+        bbled_red: PA0<Output<PushPull>>,
+        bbled_grn: PA1<Output<PushPull>>,
+        bbled_blu: PA2<Output<PushPull>>,
+        bbled_wht: PA3<Output<PushPull>>,
     }
 
     #[init]
@@ -88,13 +92,17 @@ const APP: () = {
 
         // LEDs and USB
         let gpioa = dp.GPIOA.split(&mut rcc);
-        let (bbled_red, bbled_grn, bbled_blu, bbled_wht, button3, usb_dm, usb_dp) =
+        let (bbled_red, bbled_grn, bbled_blu, bbled_wht, tb_left, tb_up, tb_right, tb_down, button3, usb_dm, usb_dp) =
             disable_interrupts (|cs| {
                 (
+                    gpioa.pa0.into_push_pull_output(cs),
                     gpioa.pa1.into_push_pull_output(cs),
                     gpioa.pa2.into_push_pull_output(cs),
                     gpioa.pa3.into_push_pull_output(cs),
-                    gpioa.pa4.into_push_pull_output(cs),
+                    gpioa.pa4.into_pull_up_input(cs),
+                    gpioa.pa5.into_pull_up_input(cs),
+                    gpioa.pa6.into_pull_up_input(cs),
+                    gpioa.pa7.into_pull_up_input(cs),
                     gpioa.pa15.into_pull_up_input(cs),
                     gpioa.pa11,
                     gpioa.pa12,
@@ -105,22 +113,33 @@ const APP: () = {
         // "I don't think that particular HAL has any helper functions to deal with setting up gpio exti interrupts yet, 
         // so you'll have to do modify the registers directly through the PAC..."
 
-        // Enable external interrupt for PA15 and other buttons
+        // Enable external interrupt for 3 aux buttons...
         dp.SYSCFG.exticr4.write(|w| { w.exti15().pa15() });
         dp.SYSCFG.exticr2.write(|w| { w.exti4().pb4() });
         dp.SYSCFG.exticr1.write(|w| { w.exti3().pb3() });
+        //... and for pulses on trackball
+        dp.SYSCFG.exticr2.write(|w| { w.exti4().pa4() });
+        dp.SYSCFG.exticr2.write(|w| { w.exti5().pa5() });
+        dp.SYSCFG.exticr2.write(|w| { w.exti6().pa6() });
+        dp.SYSCFG.exticr2.write(|w| { w.exti7().pa7() });
 
-        // Set interrupt mask for line 15, 4 and 3
+        // Set interrupt mask for all the above
         dp.EXTI.imr.write(|w| {
             w.mr3().set_bit();
             w.mr4().set_bit();
+            w.mr5().set_bit();
+            w.mr6().set_bit();
+            w.mr7().set_bit();
             w.mr15().set_bit()
         });
 
-        // Set interrupt rising trigger for line 15, 4 and 3
+        // Set interrupt rising trigger
         dp.EXTI.rtsr.write(|w| {
             w.tr3().set_bit();
             w.tr4().set_bit();
+            w.tr5().set_bit();
+            w.tr6().set_bit();
+            w.tr7().set_bit();
             w.tr15().set_bit()
         });
 
@@ -163,6 +182,10 @@ const APP: () = {
             button3,
             button4,
             button5,
+            tb_left,
+            tb_up,
+            tb_right,
+            tb_down,
             bbled_red,
             bbled_grn,
             bbled_blu,
@@ -190,7 +213,6 @@ const APP: () = {
                 ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
             },
 
-
             _ => rprintln!("Some other bits were pushed around on EXTI2_3 ;)"),
         }
     }
@@ -205,9 +227,22 @@ const APP: () = {
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
             },
             0x10 => {
-                rprintln!("PB4 triggered");
+                rprintln!("PB4 or (tb_left???) triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
             },
+            0x20 => {
+                rprintln!("tb_up triggered!");
+                ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
+            },
+            0x40 => {
+                rprintln!("tb_right triggered!");
+                ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
+            },
+            0x80 => {
+                rprintln!("tb_down triggered!");
+                ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
+            },
+
             _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
         }
     }
