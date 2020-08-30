@@ -5,7 +5,6 @@
 
 use panic_halt as _;
 use rtt_target::{rtt_init_print, rprintln};
-//use core::sync::atomic::{compiler_fence, Ordering};
 use rtic::app;
 
 use stm32f0xx_hal::{
@@ -186,18 +185,11 @@ const APP: () = {
         rprintln!("Interrupts happening on EXTI2_3");
 
         match ctx.resources.exti.pr.read().bits() {
-            0x3 => {
-                rprintln!("PB3 roundabouts on 3");
-                ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
-            },
-            0x4 => {
+            0x8 => {
                 rprintln!("PB3 triggered");
                 ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
             },
-            0x5 => {
-                rprintln!("PB3 roundabouts on 5");
-                ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
-            },
+
 
             _ => rprintln!("Some other bits were pushed around on EXTI2_3 ;)"),
         }
@@ -208,12 +200,11 @@ const APP: () = {
         rprintln!("Interrupts happening on EXTI for PA15...");
         
         match ctx.resources.exti.pr.read().bits() {
-            //0x4000 => {
             0x8000 => {
                 rprintln!("PA15 triggered");
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
             },
-            0x8 => {
+            0x10 => {
                 rprintln!("PB4 triggered");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
             },
