@@ -18,23 +18,22 @@ use stm32f0xx_hal::{
 
 use usb_device::prelude::*;
 use usb_device::bus::UsbBusAllocator;
-// use usb_device::class::UsbClass as _;
 
-// use usbd_hid::hid_class::{HIDClass};
-// use usbd_hid::descriptor::MouseReport;
-// use usbd_hid::descriptor::generator_prelude::*;
-
-use usbd_serial::{SerialPort, USB_CLASS_CDC};
+use usbd_hid::hid_class::{HIDClass};
+use usbd_hid::descriptor::MouseReport;
+use usbd_hid::descriptor::generator_prelude::*;
 
 //use cortex_m::asm::delay as cycle_delay;
 use cortex_m::interrupt::free as disable_interrupts;
 //use cortex_m::interrupt as core_m_interrupts;
 
+type UsbAlloc = &'static UsbBusAllocator<usb::UsbBusType>;
+//type UsbDevice = UsbDevice<'static, usb::UsbBusType>;
+
 #[app(device = stm32f0xx_hal::pac, peripherals = true)]
 const APP: () = {
     struct Resources {
-        usb_bus: &'static UsbBusAllocator<usb::UsbBusType>,
-        usb_serial: usbd_serial::SerialPort<'static, usb::UsbBusType>,
+        usb_bus: UsbAlloc,
         usb_device: UsbDevice<'static, usb::UsbBusType>,
         exti: pac::EXTI,
         usr_led: PB1<Output<PushPull>>,
@@ -65,6 +64,8 @@ const APP: () = {
         or UFQFPN28 (STM32F042G) package
         This code enables clock for SYSCFG and remaps USB pins to PA9 and PA10.
         */
+
+        //XXX: Use usb_bus.remap_pins() instead of the two low level lines below
         dp.RCC.apb2enr.modify(|_, w| w.syscfgen().set_bit());
         dp.SYSCFG.cfgr1.modify(|_, w| w.pa11_pa12_rmp().remapped());
 
@@ -151,9 +152,9 @@ const APP: () = {
 
         rprintln!("Defining USB parameters");
 
-        let (usb_serial, usb_device) = {
+        let usb_device = {
+
             *USB_BUS = Some(usb::UsbBus::new(usb));
-            let serial = SerialPort::new(USB_BUS.as_ref().unwrap());
             let usb_dev = UsbDeviceBuilder::new(
                         USB_BUS.as_ref().unwrap(),
                         UsbVidPid(0x16c0, 0x27dd)
@@ -161,10 +162,10 @@ const APP: () = {
                 .manufacturer("JoshFTW")
                 .product("BBTrackball")
                 .serial_number("RustFW")
-                .device_class(USB_CLASS_CDC)
+                .device_class(0x3) // HID
                 .build();
 
-            (serial, usb_dev)
+            usb_dev
         };
 
         let exti = dp.EXTI;
@@ -175,7 +176,6 @@ const APP: () = {
 
         init::LateResources {
             usb_bus: USB_BUS.as_ref().unwrap(),
-            usb_serial,
             usb_device,
             exti,
             usr_led,
@@ -193,12 +193,7 @@ const APP: () = {
         }
     }
 
-    // From RTIC on matrix.org:
-    // "And another thing; in your ”idle” you have an empty loop that is likely to be optimized away by the compiler, 
-    // causing the function to return and then it’s game over. So you should put a continue or 
-    // compiler_fence(Ordering::SeqCst) or wfi()/wfe() or whatever inside the loop, depending on desired idle behaviour"
-
-    #[idle(resources = [usb_serial])]
+    #[idle()]
     fn idle(_: idle::Context) -> ! {
         loop { cortex_m::asm::wfi(); };
     }
@@ -227,7 +222,7 @@ const APP: () = {
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
             },
             0x10 => {
-                rprintln!("PB4 or (tb_left???) triggered!");
+                rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
             },
             0x20 => {
@@ -246,20 +241,39 @@ const APP: () = {
             _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
         }
     }
-    #[task(binds = USB, resources = [usb_device, usb_serial])]
+    #[task(binds = USB, resources = [usb_device])]
     fn usbrx(ctx: usbrx::Context) {
-        usb_poll(ctx.resources.usb_device, ctx.resources.usb_serial);
+        rprintln!("USB interrupt received.");
+        usb_poll(ctx.resources.usb_device);
     }
 
     // XXX: Not entirely sure this works for STM32F042?
     //defmt::info!("Hello, world!");
 };
 
-fn usb_poll<B: usb_device::bus::UsbBus>(
-    usb_dev: &mut UsbDevice<'static, B>,
-    serial: &mut SerialPort<'static, B>
-) {
-    if !usb_dev.poll(&mut [serial]) {
-        return;
-    }
+fn usb_poll<B: usb_device::bus::UsbBus>(usb_dev: &mut UsbDevice<'static, B>) 
+{
+    usb_dev.bus().poll();
+    rprintln!("USB polling...");
+    
+    // let endpoint = usb_dev.state();
+    // usb_dev.bus().write(endpoint???, MouseReport.x.into());
+    // usb_dev.bus().write(ep_addr, buf)
+    
+    // let usb_hid = HIDClass::new(usb_bus, 
+    //                         MouseReport::desc(), 60);
+
+//    usb_hid.push_input(r: &IR);
+
 }
+
+
+// fn push_mouse_movement(usb_bus: UsbBusAllocator<usb::UsbBusType>, report: MouseReport) -> Result<usize, usb_device::UsbError> {
+//     disable_interrupts(|_| {
+//         unsafe {
+//             usb_bus.map(|hid| {
+//                 hid.push_input(&report)
+//             })
+//         }
+//     }).unwrap()
+// }
