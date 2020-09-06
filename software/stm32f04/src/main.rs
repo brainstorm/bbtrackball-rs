@@ -192,12 +192,12 @@ const APP: () = {
         }
     }
 
-    #[idle()]
+    #[idle(resources = [usb_bus, usb_device, usb_hid])]
     fn idle(_: idle::Context) -> ! {
         loop {
-            cortex_m::asm::nop();
-            //cortex_m::asm::wfi();
-        }
+            //cortex_m::asm::nop();
+            cortex_m::asm::wfi();
+        };
     }
 
     #[task(binds = EXTI2_3, resources = [exti])]
