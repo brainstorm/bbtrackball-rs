@@ -172,17 +172,13 @@ const APP: () = {
                     .manufacturer("JoshFTW")
                     .product("BBTrackball")
                     .serial_number("RustFW")
-                    .device_class(0x3) // HID
+                    .device_class(0xFE) // HID
                     .build();
 
             let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
 
             (usb_dev, usb_hid)
         };
-
-        //let mut core = cortex_m::Peripherals::steal();
-        //core.NVIC. .enable(Interrupt::UART0);
-        //core_m_interrupts.enable();
 
         init::LateResources {
             usb_bus: USB_BUS.as_ref().unwrap(),
@@ -270,47 +266,6 @@ const APP: () = {
         usb_hid.push_input(&mr).ok();
         usb_dev.poll(&mut [usb_hid]);
 
-        //let mut hid_result = usb_hid.push_input(&MouseReport{x: 0, y: -4, buttons:0}).ok().unwrap_or(0);
-        //if usb_dev.poll(&mut [ctx.resources.usb_hid]) {
-            // HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
-            //ctx.resources.usb_hid.poll();
-        //}
-        //usb_dev.poll(&mut hid_result);
-
-        // usb_hid.map(|hid| {
-        //     usb_dev.poll(&mut [hid]);
-        // });
-        //usb_poll(ctx.resources.usb_device, ctx.resources.usb_hid);
     }
 
-    // XXX: Not entirely sure this works for STM32F042?
-    //defmt::info!("Hello, world!");
 };
-
-// fn usb_poll<B: usb_device::bus::UsbBus, C: usb_device::bus::UsbBus>(
-//     usb_dev: &mut UsbDevice<'static, B>,
-//     usb_hid: &mut HIDClass<'static, C>,
-// ) {
-//     //usb_dev.bus().poll();
-//     rprintln!("USB polling...");
-//     //usb_hid.map(|hid| usb_dev.poll(&mut [hid]));
-//     //usb_bus.map(|usb_dev| {
-
-//     // usb_dev.bus().write(endpoint???, MouseReport.x.into());
-//     // usb_dev.bus().write(ep_addr, buf)
-
-//     // let usb_hid = HIDClass::new(usb_bus,
-//     //                         MouseReport::desc(), 60);
-
-//     //usb_hid.push_input(r: &IR);
-// }
-
-// fn push_mouse_movement(usb_bus: UsbBusAllocator<usb::UsbBusType>, report: MouseReport) -> Result<usize, usb_device::UsbError> {
-//     disable_interrupts(|_| {
-//         unsafe {
-//             usb_bus.map(|hid| {
-//                 hid.push_input(&report)
-//             })
-//         }
-//     }).unwrap()
-// }
