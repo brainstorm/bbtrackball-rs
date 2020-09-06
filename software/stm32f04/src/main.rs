@@ -1,5 +1,5 @@
-//#![deny(unsafe_code)]
-//#![deny(warnings)]
+#![deny(unsafe_code)]
+#![deny(warnings)]
 #![no_std]
 #![no_main]
 
@@ -23,17 +23,12 @@ use usbd_hid::descriptor::generator_prelude::*;
 use usbd_hid::descriptor::MouseReport;
 use usbd_hid::hid_class::HIDClass;
 
-//use cortex_m::asm::delay as cycle_delay;
 use cortex_m::interrupt::free as disable_interrupts;
-//use cortex_m::interrupt as core_m_interrupts;
-
-type UsbAlloc = &'static UsbBusAllocator<usb::UsbBusType>;
-//type UsbDevice = UsbDevice<'static, usb::UsbBusType>;
 
 #[app(device = stm32f0xx_hal::pac, peripherals = true)]
 const APP: () = {
     struct Resources {
-        usb_bus: UsbAlloc,
+        usb_bus: &'static UsbBusAllocator<usb::UsbBusType>,
         usb_device: UsbDevice<'static, usb::UsbBusType>,
         usb_hid: HIDClass<'static, usb::UsbBusType>,
         exti: pac::EXTI,
@@ -122,9 +117,6 @@ const APP: () = {
             )
         });
 
-        // "I don't think that particular HAL has any helper functions to deal with setting up gpio exti interrupts yet,
-        // so you'll have to do modify the registers directly through the PAC..."
-
         // Enable external interrupt for 3 aux buttons...
         dp.SYSCFG.exticr1.write(|w| w.exti3().pb3());
         // dp.SYSCFG.exticr2.write(|w| { w.exti4().pb4() }); // Disable spare button in favor of tb_left
@@ -203,7 +195,8 @@ const APP: () = {
     #[idle()]
     fn idle(_: idle::Context) -> ! {
         loop {
-            cortex_m::asm::wfi();
+            cortex_m::asm::nop();
+            //cortex_m::asm::wfi();
         }
     }
 
@@ -250,6 +243,7 @@ const APP: () = {
             _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
         }
     }
+
     #[task(binds = USB, resources = [usb_device, usb_hid])]
     fn usb_handler(ctx: usb_handler::Context) {
         rprintln!("USB interrupt received.");
@@ -265,7 +259,5 @@ const APP: () = {
 
         usb_hid.push_input(&mr).ok();
         usb_dev.poll(&mut [usb_hid]);
-
     }
-
 };
