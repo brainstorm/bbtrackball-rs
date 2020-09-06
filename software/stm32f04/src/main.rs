@@ -16,8 +16,7 @@ use stm32f0xx_hal::{
     usb,
 };
 
-use usb_device::bus::UsbBusAllocator;
-use usb_device::prelude::*;
+use usb_device::{bus::UsbBusAllocator, prelude::*};
 
 use usbd_hid::descriptor::generator_prelude::*;
 use usbd_hid::descriptor::MouseReport;
@@ -171,6 +170,8 @@ const APP: () = {
 
             (usb_dev, usb_hid)
         };
+
+        let exti = dp.EXTI;
 
         init::LateResources {
             usb_bus: USB_BUS.as_ref().unwrap(),
