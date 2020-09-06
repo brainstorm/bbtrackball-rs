@@ -38,3 +38,8 @@ fp-info-cache
 
 # 3D Models
 *.step
+
+# Rust
+target
+Cargo.lock
+.idea
