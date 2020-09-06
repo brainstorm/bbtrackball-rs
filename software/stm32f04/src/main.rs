@@ -154,7 +154,6 @@ const APP: () = {
 
         rprintln!("Defining USB parameters");
 
-        let exti = dp.EXTI;
         let (usb_device, usb_hid) = {
             *USB_BUS = Some(usb::UsbBus::new(usb));
 
