@@ -14,6 +14,7 @@ use stm32f0xx_hal::{
     pac,
     prelude::*,
     usb,
+    stm32::Interrupt,
 };
 
 use usb_device::{bus::UsbBusAllocator, prelude::*};
@@ -151,11 +152,12 @@ const APP: () = {
             pin_dm: usb_dm,
             pin_dp: usb_dp,
         };
+
         *USB_BUS = Some(usb::UsbBus::new(usb));
-        
+
         rprintln!("Preparing HID mouse...");
         let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
-        rprintln!("Defining USB parameters");
+        rprintln!("Defining USB parameters...");
         let usb_device =
                 UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0x16c0, 0x27dd))
                     .manufacturer("JoshFTW")
@@ -163,6 +165,7 @@ const APP: () = {
                     .serial_number("RustFW")
                     .device_class(0xFE) // HID
                     .build();
+
 
         rprintln!("Instantiating dp.EXTI...");
         let exti = dp.EXTI;
@@ -191,8 +194,10 @@ const APP: () = {
     #[idle(resources = [usb_bus, usb_device, usb_hid])]
     fn idle(_: idle::Context) -> ! {
         loop {
-            cortex_m::asm::nop();
-            //cortex_m::asm::wfi();
+            //cortex_m::asm::nop();
+            cortex_m::asm::wfi();
+            rtic::pend(Interrupt::USB);
+            cortex_m::asm::delay(100_000);
         };
     }
 
