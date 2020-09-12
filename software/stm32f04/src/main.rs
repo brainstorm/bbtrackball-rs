@@ -159,7 +159,7 @@ const APP: () = {
         let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
         rprintln!("Defining USB parameters...");
         let usb_device =
-                UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0x16c0, 0x27dd))
+                UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
                     .manufacturer("JoshFTW")
                     .product("BBTrackball")
                     .serial_number("RustFW")
@@ -194,7 +194,7 @@ const APP: () = {
     #[idle(resources = [usb_bus, usb_device, usb_hid])]
     fn idle(_: idle::Context) -> ! {
         loop {
-            //cortex_m::asm::nop();
+            cortex_m::asm::nop();
             cortex_m::asm::wfi();
             rtic::pend(Interrupt::USB);
             cortex_m::asm::delay(100_000);
@@ -258,7 +258,9 @@ const APP: () = {
             buttons: 0,
         };
 
+        rprintln!("Sending mouse report...");
         usb_hid.push_input(&mr).ok();
+        rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
         usb_dev.poll(&mut [usb_hid]);
     }
 };
