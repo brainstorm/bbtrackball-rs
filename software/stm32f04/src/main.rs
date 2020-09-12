@@ -151,13 +151,12 @@ const APP: () = {
             pin_dm: usb_dm,
             pin_dp: usb_dp,
         };
-
+        *USB_BUS = Some(usb::UsbBus::new(usb));
+        
+        rprintln!("Preparing HID mouse...");
+        let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
         rprintln!("Defining USB parameters");
-
-        let (usb_device, usb_hid) = {
-            *USB_BUS = Some(usb::UsbBus::new(usb));
-
-            let usb_dev =
+        let usb_device =
                 UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0x16c0, 0x27dd))
                     .manufacturer("JoshFTW")
                     .product("BBTrackball")
@@ -165,12 +164,9 @@ const APP: () = {
                     .device_class(0xFE) // HID
                     .build();
 
-            let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
-
-            (usb_dev, usb_hid)
-        };
-
+        rprintln!("Instantiating dp.EXTI...");
         let exti = dp.EXTI;
+        rprintln!("Defining late resources...");
 
         init::LateResources {
             usb_bus: USB_BUS.as_ref().unwrap(),
@@ -195,13 +191,13 @@ const APP: () = {
     #[idle(resources = [usb_bus, usb_device, usb_hid])]
     fn idle(_: idle::Context) -> ! {
         loop {
-            //cortex_m::asm::nop();
-            cortex_m::asm::wfi();
+            cortex_m::asm::nop();
+            //cortex_m::asm::wfi();
         };
     }
 
     #[task(binds = EXTI2_3, resources = [exti])]
-    fn twotothree(ctx: twotothree::Context) {
+    fn exti2_3_interrupt(ctx: exti2_3_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI2_3");
 
         match ctx.resources.exti.pr.read().bits() {
@@ -215,7 +211,7 @@ const APP: () = {
     }
 
     #[task(binds = EXTI4_15, resources = [exti])]
-    fn gpioa(ctx: gpioa::Context) {
+    fn exti_4_15_interrupt(ctx: exti_4_15_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI for PA15...");
 
         match ctx.resources.exti.pr.read().bits() {
