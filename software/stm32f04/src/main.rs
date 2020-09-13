@@ -5,7 +5,7 @@
 
 use panic_halt as _;
 use rtic::app;
-//use rtic::Mutex;
+use rtic::{Exclusive, Mutex};
 use rtt_target::{rprintln, rtt_init_print};
 
 use stm32f0xx_hal::{
@@ -14,8 +14,8 @@ use stm32f0xx_hal::{
     gpio::{Input, Output, PullUp, PushPull},
     pac,
     prelude::*,
-    usb,
     stm32::Interrupt,
+    usb,
 };
 
 use usb_device::{bus::UsbBusAllocator, prelude::*};
@@ -159,14 +159,12 @@ const APP: () = {
         rprintln!("Preparing HID mouse...");
         let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
         rprintln!("Defining USB parameters...");
-        let usb_device =
-                UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
-                    .manufacturer("JoshFTW")
-                    .product("BBTrackball")
-                    .serial_number("RustFW")
-                    .device_class(0xFE) // HID
-                    .build();
-
+        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
+            .manufacturer("JoshFTW")
+            .product("BBTrackball")
+            .serial_number("RustFW")
+            .device_class(0xFE) // HID
+            .build();
 
         rprintln!("Instantiating dp.EXTI...");
         let exti = dp.EXTI;
@@ -196,18 +194,18 @@ const APP: () = {
     fn idle(ctx: idle::Context) -> ! {
         let dev = ctx.resources.usb_device;
         let hid = ctx.resources.usb_hid;
-        
+
         loop {
             cortex_m::asm::nop();
             cortex_m::asm::wfi();
             rtic::pend(Interrupt::USB);
             cortex_m::asm::delay(100_000);
-            
-            send_mouse_report(hid, dev, 0, 0, 0);
-        };
+
+            send_mouse_report(Exclusive(&mut hid), Exclusive(&mut dev), 0, 0, 0);
+        }
     }
 
-    #[task(binds = EXTI2_3, resources = [exti])]
+    #[task(binds = EXTI2_3, priority = 2, resources = [exti])]
     fn exti2_3_interrupt(ctx: exti2_3_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI2_3");
 
@@ -221,7 +219,7 @@ const APP: () = {
         }
     }
 
-    #[task(binds = EXTI4_15, resources = [exti])]
+    #[task(binds = EXTI4_15, priority = 2, resources = [exti])]
     fn exti_4_15_interrupt(ctx: exti_4_15_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI for PA15...");
 
@@ -251,35 +249,30 @@ const APP: () = {
         }
     }
 
-    #[task(binds = USB, resources = [usb_device, usb_hid])]
+    #[task(binds = USB, priority = 1, resources = [usb_device, usb_hid])]
     fn usb_handler(ctx: usb_handler::Context) {
         rprintln!("USB interrupt received.");
 
         let dev = ctx.resources.usb_device;
         let hid = ctx.resources.usb_hid;
 
-        send_mouse_report(hid, dev, 0, 0, 0);
+        send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
     }
 };
 
-// fn send_mouse_report(shared_hid: HIDClass<usb::UsbBusType>,
-//                      shared_dev: UsbDevice<usb::UsbBusType>,
-fn send_mouse_report(shared_hid: resources::usb_hid,
-                    shared_dev: resources::usb_device,
-                    x: i8, y: i8, buttons: u8) {
-
-    let mr = MouseReport {
-        x,
-        y,
-        buttons,
-    };
+fn send_mouse_report(
+    mut shared_hid: impl Mutex<T = HIDClass<'static, usb::UsbBusType>>,
+    mut shared_dev: impl Mutex<T = UsbDevice<'static, usb::UsbBusType>>,
+    x: i8,
+    y: i8,
+    buttons: u8,
+) {
+    let mr = MouseReport { x, y, buttons };
 
     shared_hid.lock(|hid| {
         rprintln!("Sending mouse report...");
         hid.push_input(&mr).ok();
         rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
-        shared_dev.lock(|dev|
-            dev.poll(&mut [hid])
-        );
+        shared_dev.lock(|dev| dev.poll(&mut [hid]));
     });
 }
