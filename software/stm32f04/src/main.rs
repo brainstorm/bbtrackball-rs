@@ -5,6 +5,7 @@
 
 use panic_halt as _;
 use rtic::app;
+//use rtic::Mutex;
 use rtt_target::{rprintln, rtt_init_print};
 
 use stm32f0xx_hal::{
@@ -191,13 +192,18 @@ const APP: () = {
         }
     }
 
-    #[idle(resources = [usb_bus, usb_device, usb_hid])]
-    fn idle(_: idle::Context) -> ! {
+    #[idle(resources = [usb_device, usb_hid])]
+    fn idle(ctx: idle::Context) -> ! {
+        let dev = ctx.resources.usb_device;
+        let hid = ctx.resources.usb_hid;
+        
         loop {
             cortex_m::asm::nop();
             cortex_m::asm::wfi();
             rtic::pend(Interrupt::USB);
             cortex_m::asm::delay(100_000);
+            
+            send_mouse_report(hid, dev, 0, 0, 0);
         };
     }
 
@@ -249,18 +255,31 @@ const APP: () = {
     fn usb_handler(ctx: usb_handler::Context) {
         rprintln!("USB interrupt received.");
 
-        let usb_dev = ctx.resources.usb_device;
-        let usb_hid = ctx.resources.usb_hid;
+        let dev = ctx.resources.usb_device;
+        let hid = ctx.resources.usb_hid;
 
-        let mr = MouseReport {
-            x: 0,
-            y: 0,
-            buttons: 0,
-        };
-
-        rprintln!("Sending mouse report...");
-        usb_hid.push_input(&mr).ok();
-        rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
-        usb_dev.poll(&mut [usb_hid]);
+        send_mouse_report(hid, dev, 0, 0, 0);
     }
 };
+
+// fn send_mouse_report(shared_hid: HIDClass<usb::UsbBusType>,
+//                      shared_dev: UsbDevice<usb::UsbBusType>,
+fn send_mouse_report(shared_hid: resources::usb_hid,
+                    shared_dev: resources::usb_device,
+                    x: i8, y: i8, buttons: u8) {
+
+    let mr = MouseReport {
+        x,
+        y,
+        buttons,
+    };
+
+    shared_hid.lock(|hid| {
+        rprintln!("Sending mouse report...");
+        hid.push_input(&mr).ok();
+        rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
+        shared_dev.lock(|dev|
+            dev.poll(&mut [hid])
+        );
+    });
+}
