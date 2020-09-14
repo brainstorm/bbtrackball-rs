@@ -66,8 +66,10 @@ const APP: () = {
         dp.RCC.apb2enr.modify(|_, w| w.syscfgen().set_bit());
         dp.SYSCFG.cfgr1.modify(|_, w| w.pa11_pa12_rmp().remapped());
 
-        rprintln!("Initializing peripherals");
+        // Power on bbled dance
+        //bbled_red.toggle().ok();
 
+        rprintln!("Initializing peripherals");
         let mut rcc = dp
             .RCC
             .configure()
@@ -163,7 +165,7 @@ const APP: () = {
             .manufacturer("JoshFTW")
             .product("BBTrackball")
             .serial_number("RustFW")
-            .device_class(0xFE) // HID
+            .device_class(0xEF) // MISC
             .build();
 
         rprintln!("Instantiating dp.EXTI...");
@@ -191,9 +193,9 @@ const APP: () = {
     }
 
     #[idle(resources = [usb_device, usb_hid])]
-    fn idle(_ctx: idle::Context) -> ! {
-        // let dev = ctx.resources.usb_device;
-        // let hid = ctx.resources.usb_hid;
+    fn idle(ctx: idle::Context) -> ! {
+        let mut dev = ctx.resources.usb_device;
+        let mut hid = ctx.resources.usb_hid;
 
         loop {
             cortex_m::asm::nop();
@@ -201,6 +203,15 @@ const APP: () = {
             rtic::pend(Interrupt::USB);
             cortex_m::asm::delay(100_000);
 
+            let mr = MouseReport { x: 0, y: 0, buttons: 0 };
+
+            hid.lock(|h| {
+                rprintln!("Sending mouse report...");
+                h.push_input(&mr).ok();
+                rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
+                dev.lock(|d| d.poll(&mut [h]));
+            });
+        
             //send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
         }
     }
@@ -219,37 +230,43 @@ const APP: () = {
         }
     }
 
-    #[task(binds = EXTI4_15, resources = [exti, usb_device, usb_hid])]
+    #[task(binds = EXTI4_15, resources = [exti, usb_device, usb_hid, usr_led, bbled_red, bbled_grn, bbled_wht, bbled_blu])]
     fn exti_4_15_interrupt(ctx: exti_4_15_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI for PA15...");
 
         let dev = ctx.resources.usb_device;
         let hid = ctx.resources.usb_hid;
+        let usr_led = ctx.resources.usr_led;
 
         match ctx.resources.exti.pr.read().bits() {
             0x8000 => {
                 rprintln!("PA15 triggered");
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
+                usr_led.toggle().ok();
             }
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
                 send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                usr_led.toggle().ok();
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
                 send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                usr_led.toggle().ok();
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
                 send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                usr_led.toggle().ok();
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
                 send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                usr_led.toggle().ok();
             }
 
             _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
@@ -283,3 +300,13 @@ fn send_mouse_report(
         shared_dev.lock(|dev| dev.poll(&mut [hid]));
     });
 }
+
+// fn bb_leds_dance(
+//     mut bbled_red: impl Mutex<T = PA0<Output<PushPull>>>,
+//     mut bbled_wht: impl Mutex<T = PA1<Output<PushPull>>>,
+//     mut bbled_blu: impl Mutex<T = PA2<Output<PushPull>>>,
+//     mut bbled_grn: impl Mutex<T = PA3<Output<PushPull>>>,
+// )
+// {
+//     bbled_red.toggle().ok();
+// }
