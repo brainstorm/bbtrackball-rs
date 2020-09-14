@@ -205,7 +205,7 @@ const APP: () = {
         }
     }
 
-    #[task(binds = EXTI2_3, priority = 2, resources = [exti])]
+    #[task(binds = EXTI2_3, resources = [exti])]
     fn exti2_3_interrupt(ctx: exti2_3_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI2_3");
 
@@ -219,9 +219,12 @@ const APP: () = {
         }
     }
 
-    #[task(binds = EXTI4_15, priority = 2, resources = [exti])]
+    #[task(binds = EXTI4_15, resources = [exti, usb_device, usb_hid])]
     fn exti_4_15_interrupt(ctx: exti_4_15_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI for PA15...");
+
+        let dev = ctx.resources.usb_device;
+        let hid = ctx.resources.usb_hid;
 
         match ctx.resources.exti.pr.read().bits() {
             0x8000 => {
@@ -231,25 +234,29 @@ const APP: () = {
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
             }
 
             _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
         }
     }
 
-    #[task(binds = USB, priority = 1, resources = [usb_device, usb_hid])]
+    #[task(binds = USB, resources = [usb_device, usb_hid])]
     fn usb_handler(ctx: usb_handler::Context) {
         rprintln!("USB interrupt received.");
 
