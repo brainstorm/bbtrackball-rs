@@ -201,7 +201,7 @@ const APP: () = {
             rtic::pend(Interrupt::USB);
             cortex_m::asm::delay(100_000);
 
-            //send_mouse_report(hid, dev, 0, 0, 0);
+            //send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
         }
     }
 
