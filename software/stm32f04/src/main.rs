@@ -191,9 +191,9 @@ const APP: () = {
     }
 
     #[idle(resources = [usb_device, usb_hid])]
-    fn idle(ctx: idle::Context) -> ! {
-        let dev = ctx.resources.usb_device;
-        let hid = ctx.resources.usb_hid;
+    fn idle(_ctx: idle::Context) -> ! {
+        // let dev = ctx.resources.usb_device;
+        // let hid = ctx.resources.usb_hid;
 
         loop {
             cortex_m::asm::nop();
@@ -201,7 +201,7 @@ const APP: () = {
             rtic::pend(Interrupt::USB);
             cortex_m::asm::delay(100_000);
 
-            send_mouse_report(Exclusive(&mut hid), Exclusive(&mut dev), 0, 0, 0);
+            //send_mouse_report(hid, dev, 0, 0, 0);
         }
     }
 
