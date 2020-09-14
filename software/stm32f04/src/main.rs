@@ -212,7 +212,7 @@ const APP: () = {
                 dev.lock(|d| d.poll(&mut [h]));
             });
         
-            //send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+            // send_mouse_report(hid, dev, 0, 0, 0);
         }
     }
 
