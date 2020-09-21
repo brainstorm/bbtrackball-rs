@@ -14,7 +14,6 @@ use stm32f0xx_hal::{
     gpio::{Input, Output, PullUp, PushPull},
     pac,
     prelude::*,
-    stm32::Interrupt,
     usb,
 };
 
@@ -161,7 +160,7 @@ const APP: () = {
         rprintln!("Preparing HID mouse...");
         let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
         rprintln!("Defining USB parameters...");
-        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
+        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0x05ac, 0x027a))
             .manufacturer("JoshFTW")
             .product("BBTrackball")
             .serial_number("RustFW")
@@ -193,26 +192,11 @@ const APP: () = {
     }
 
     #[idle(resources = [usb_device, usb_hid])]
-    fn idle(ctx: idle::Context) -> ! {
-        let mut dev = ctx.resources.usb_device;
-        let mut hid = ctx.resources.usb_hid;
-
+    fn idle(_: idle::Context) -> ! {
         loop {
             cortex_m::asm::nop();
             cortex_m::asm::wfi();
-            rtic::pend(Interrupt::USB);
-            cortex_m::asm::delay(100_000);
-
-            let mr = MouseReport { x: 0, y: 0, buttons: 0 };
-
-            hid.lock(|h| {
-                rprintln!("Sending mouse report...");
-                h.push_input(&mr).ok();
-                rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
-                dev.lock(|d| d.poll(&mut [h]));
-            });
-        
-            // send_mouse_report(hid, dev, 0, 0, 0);
+            //cortex_m::asm::delay(100_000);
         }
     }
 
@@ -280,13 +264,14 @@ const APP: () = {
         let dev = ctx.resources.usb_device;
         let hid = ctx.resources.usb_hid;
 
-        send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+        // USB dev poll only in the interrupt handler
+        dev.poll(&mut [hid]);
     }
 };
 
 fn send_mouse_report(
     mut shared_hid: impl Mutex<T = HIDClass<'static, usb::UsbBusType>>,
-    mut shared_dev: impl Mutex<T = UsbDevice<'static, usb::UsbBusType>>,
+    mut _shared_dev: impl Mutex<T = UsbDevice<'static, usb::UsbBusType>>,
     x: i8,
     y: i8,
     buttons: u8,
@@ -296,8 +281,8 @@ fn send_mouse_report(
     shared_hid.lock(|hid| {
         rprintln!("Sending mouse report...");
         hid.push_input(&mr).ok();
-        rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
-        shared_dev.lock(|dev| dev.poll(&mut [hid]));
+        // rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
+        // shared_dev.lock(|dev| dev.poll(&mut [hid]));
     });
 }
 
