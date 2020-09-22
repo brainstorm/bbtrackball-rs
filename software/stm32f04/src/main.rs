@@ -196,7 +196,6 @@ const APP: () = {
         loop {
             cortex_m::asm::nop();
             cortex_m::asm::wfi();
-            //cortex_m::asm::delay(100_000);
         }
     }
 
@@ -231,25 +230,25 @@ const APP: () = {
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 10, 10, 0);
                 usr_led.toggle().ok();
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 20, 20, 0);
                 usr_led.toggle().ok();
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 30, 30, 0);
                 usr_led.toggle().ok();
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 40, 40, 0);
                 usr_led.toggle().ok();
             }
 
@@ -281,17 +280,5 @@ fn send_mouse_report(
     shared_hid.lock(|hid| {
         rprintln!("Sending mouse report...");
         hid.push_input(&mr).ok();
-        // rprintln!("Mouse report sent, polling usb_device and passing usb_hid...");
-        // shared_dev.lock(|dev| dev.poll(&mut [hid]));
     });
 }
-
-// fn bb_leds_dance(
-//     mut bbled_red: impl Mutex<T = PA0<Output<PushPull>>>,
-//     mut bbled_wht: impl Mutex<T = PA1<Output<PushPull>>>,
-//     mut bbled_blu: impl Mutex<T = PA2<Output<PushPull>>>,
-//     mut bbled_grn: impl Mutex<T = PA3<Output<PushPull>>>,
-// )
-// {
-//     bbled_red.toggle().ok();
-// }
