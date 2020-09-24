@@ -19,7 +19,7 @@ use stm32f0xx_hal::{
 
 use usb_device::{bus::UsbBusAllocator, prelude::*};
 
-use usbd_hid::descriptor::generator_prelude::*;
+//use usbd_hid::descriptor::generator_prelude::*;
 use usbd_hid::descriptor::MouseReport;
 use usbd_hid::hid_class::HIDClass;
 
@@ -157,14 +157,83 @@ const APP: () = {
 
         *USB_BUS = Some(usb::UsbBus::new(usb));
 
+        // SiliconWin mouse
+        let _hid_siliconwin_desc: &[u8] = &[
+            0x05, 0x01,
+            0x09, 0x02,
+            0xA1, 0x01,
+            0x85, 0x01,
+            0x09, 0x01,
+            0xA1, 0x00,
+            0x05, 0x09,
+            0x19, 0x01,
+            0x29, 0x05,
+            0x15, 0x00,
+            0x25, 0x01,
+            0x95, 0x05,
+            0x75, 0x01,
+            0x81, 0x02,
+            0x95, 0x01,
+            0x75, 0x03,
+            0x81, 0x01,
+            0x05, 0x01,
+            0x09, 0x30,
+            0x09, 0x31,
+            0x16, 0x00,
+            0xF8, 0x26,
+            0xFF, 0x07,
+            0x75, 0x0C,
+            0x95, 0x02,
+            0x81, 0x06,
+            0x09, 0x38,
+            0x15, 0x81,
+            0x25, 0x7F,
+            0x75, 0x08,
+            0x95, 0x01,
+            0x81, 0x06,
+            0xC0, 0xC0,
+        ];
+
         rprintln!("Preparing HID mouse...");
-        let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
+        let hid_mouse_desc: &[u8] = &[
+            0x05, 0x01,       // Usage Page (Generic Desktop)
+            0x09, 0x02,       // Usage (Mouse)
+            0xa1, 0x01,       // Collection (Application)
+            0x09, 0x01,       // Usage (Pointer)
+            0xA1, 0x00,       // Collection (Physical)
+            0x05, 0x09,       // Usage Page (Buttons)
+            0x19, 0x01,       // Usage Minimum (224)
+            0x29, 0x03,       // Usage Maximum (231)
+            0x15, 0x00,       // Logical Minimum (0)
+            0x25, 0x01,       // Logical Maximum (1)
+            0x95, 0x03,       // Report count (8)
+            0x75, 0x01,       // Report Size (1)
+            0x81, 0x02,       // Input (Data, Variable, Absolute)
+            0x95, 0x01,       // Report Count (1)
+            0x75, 0x05,
+            0x81, 0x01,
+            0x05, 0x01,      
+            0x09, 0x30,
+            0x09, 0x31,
+            0x15, 0x81,
+            0x25, 0x7F,
+            0x75, 0x08,
+            0x95, 0x02,
+            0x81, 0x06,       // Input (Data, Array, Absolute)
+            0xc0,             // End Collection
+            0xc0,             // End Collection
+        ];
+
+        let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), hid_mouse_desc, 60);
+        //let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
         rprintln!("Defining USB parameters...");
-        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0x05ac, 0x027a))
+        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
             .manufacturer("JoshFTW")
             .product("BBTrackball")
             .serial_number("RustFW")
-            .device_class(0xEF) // MISC
+            .device_class(0x00) // MISC
+            .device_sub_class(0x00)
+            .device_protocol(0x00)
             .build();
 
         rprintln!("Instantiating dp.EXTI...");
@@ -225,30 +294,31 @@ const APP: () = {
             0x8000 => {
                 rprintln!("PA15 triggered");
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 1);
                 usr_led.toggle().ok();
             }
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 10, 10, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 1, 1, 0);
                 usr_led.toggle().ok();
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 20, 20, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 1, 1, 0);
                 usr_led.toggle().ok();
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 30, 30, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 1, 1, 0);
                 usr_led.toggle().ok();
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 40, 40, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 1, 1, 0);
                 usr_led.toggle().ok();
             }
 
