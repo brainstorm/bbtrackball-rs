@@ -159,13 +159,13 @@ const APP: () = {
 
         rprintln!("Preparing HID mouse...");
         let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
-        
+
         rprintln!("Defining USB parameters...");
         let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
             .manufacturer("JoshFTW")
             .product("BBTrackball")
             .serial_number("RustFW")
-            .device_class(0x00) // MISC
+            .device_class(0x00)
             .device_sub_class(0x00)
             .device_protocol(0x00)
             .build();
@@ -234,25 +234,25 @@ const APP: () = {
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), -5, 0, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 10, 0, 0);
                 usr_led.toggle().ok();
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 5, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 10, 0);
                 usr_led.toggle().ok();
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 5, 0, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), -10, 0, 0);
                 usr_led.toggle().ok();
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, -5, 0);
+                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, -10, 0);
                 usr_led.toggle().ok();
             }
 
