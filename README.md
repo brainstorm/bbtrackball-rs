@@ -10,7 +10,7 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 
 * DPI tweaking to have a better trackball accuracy or speed/stepping.
 * [Button debouncer][debouncer].
-* Remove one of the buttons of the board, since it conflicts with one of the trackball GPIOs... oops, hardware blopper ;)
+* Remove one of the buttons of the <acronym title="Printed Circuit Board">PCB</acronym>, since it conflicts with one of the trackball GPIOs... oops, hardware blopper ;)
 * Add acceleration [like @LSChyi did][add_accel]?
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
 * [Write a simplified RTIC example to return the favour to that amazing rust-embedded community][rtic_hid_example].
