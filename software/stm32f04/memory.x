@@ -1,4 +1,3 @@
-
 /* STM32F042G6 */
 MEMORY
 {
