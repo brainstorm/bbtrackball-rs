@@ -13,7 +13,7 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 * Remove one of the buttons of the <acronym title="Printed Circuit Board">PCB</acronym>, since it conflicts with one of the trackball GPIOs... oops, hardware blopper ;)
 * Add acceleration [like @LSChyi did][add_accel]?
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
-* [Write a simplified RTIC example to return the favour to that amazing rust-embedded community][rtic_hid_example].
+* ~~[Write a simplified RTIC example to return the favour to that amazing rust-embedded community][rtic_hid_example]~~: [Done][rtic_pr].
 
 ## :clap: Special thanks to
 
@@ -36,3 +36,4 @@ And all the folks from the RTIC matrix.org community for patiently guiding and h
 [debouncer]: https://crates.io/crates/unflappable
 [microsoft_natural_keyboard_4000]: https://www.microsoft.com/accessories/en-us/products/keyboards/natural-ergonomic-keyboard-4000/b2m-00012
 [stm32f042]: https://www.st.com/en/microcontrollers-microprocessors/stm32f0-series.html
+[rtic_pr]: https://github.com/rtic-rs/rtic-examples/pull/12
