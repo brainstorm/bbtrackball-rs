@@ -1,4 +1,4 @@
-# :blueberries: Blackberry rusty HID mouse
+# :mouse: Blackberry rusty HID mouse
 
 The purpose of this project is to build a [blackberry-trackball mouse][bb_trackball] and glue it to the middle of [an (allegedly) ergonomic keyboard][microsoft_natural_keyboard_4000]... **in Rust Embedded**, for the [STM32F042][stm32f042] :)
 
@@ -15,7 +15,7 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
 * [Write a simplified RTIC example to return the favour to that amazing rust-embedded community][rtic_hid_example].
 
-## :clapping_hands: Special thanks to
+## :clap: Special thanks to
 
 [@joshajohnson][joshajohnson]
 [@mvirkkunen][lumpio]
