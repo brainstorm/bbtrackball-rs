@@ -1,4 +1,4 @@
-# :mouse: Blackberry rusty HID mouse
+# :mouse: Blackberry rusty mouse
 
 The purpose of this project is to build a [blackberry-trackball mouse][bb_trackball] and glue it to the middle of [an (allegedly) ergonomic keyboard][microsoft_natural_keyboard_4000]... **in Rust Embedded**, for the [STM32F042][stm32f042] :)
 
