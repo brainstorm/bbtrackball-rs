@@ -2,6 +2,8 @@
 
 The purpose of this project is to build an [integrated mouse for a regular (allegedly_ergonomic_but_not_really) keyboard][bb_trackball]... **in Rust** :)
 
+![dev_board](img/dev_board.jpg)
+
 This came about [from twitter idea to board, then to Rust Embedded](https://twitter.com/braincode/status/1275406584714104833). The code is based on [RTIC][rtic] rust-embedded framework (formerly known as RTFM). It exclusively uses interrupts *and* [also works on OSX, not only Linux][osx_not_working] (wink wink, nudge nudge, [James][jamesmunns] ;P).
 
 ## Future improvements shall you take this code with you (PRs super welcome!)
