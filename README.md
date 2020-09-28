@@ -28,7 +28,7 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 [@TeXitoi][texitoi]
 [@TheZoq2][thezoq2]
 
-And all the folks from the RTIC matrix.org community for patiently guiding and helping me in this experiment.
+And all the folks from the [RTIC matrix.org community][rtic_matrix] for patiently guiding and helping me in this experiment.
 
 [bb_trackball]: https://os.mbed.com/users/AdamGreen/notebook/blackberrytrackballmouse/
 [joshajohnson]: https://github.com/joshajohnson
@@ -51,3 +51,4 @@ And all the folks from the RTIC matrix.org community for patiently guiding and h
 [texitoi]: https://github.com/TeXitoi
 [thezoq2]: https://gitlab.com/TheZoq2/hotas
 [old_beken_hardware]: https://mitxela.com/forum/topic/mocute-051-bluetooth-gamepad-bk3231-change-hid-profile-from-keyboard-gamepad
+[rtic_matrix]: https://matrix.to/#/#rtic:matrix.org
