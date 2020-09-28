@@ -13,6 +13,10 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 * Remove one of the buttons of the <acronym title="Printed Circuit Board">PCB</acronym>, since it conflicts with one of the trackball GPIOs... oops, hardware blopper ;)
 * Add acceleration [like @LSChyi did][add_accel]?
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
+* If enough people show interest and [**choose to sponsor me**][gh_sponsor_1], look at how to:
+	1. Download and understand the flash process on the [Beken 3231][beken3231].
+	2. Implement an LLVM backend for the [ARM968E-S][ARM968E-S] and have `rustc` working with it.
+	3. Goal: **have a sub-$1 bluetooth IC that potentially does all we need and more** plus learn to [implement an LLVM backend from scratch][llvm_cpu0] :)  
 * ~~[Write a simplified RTIC example to return the favour to that amazing rust-embedded community][rtic_hid_example]~~: [Done][rtic_pr].
 
 ## :clap: Special thanks to
@@ -21,6 +25,8 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 [@mvirkkunen][lumpio]
 [@therealprof][therealprof]
 [@jamesmunns][jamesmunns]
+[@TeXitoi][texitoi]
+[@TheZoq2][thezoq2]
 
 And all the folks from the RTIC matrix.org community for patiently guiding and helping me in this experiment.
 
@@ -37,3 +43,10 @@ And all the folks from the RTIC matrix.org community for patiently guiding and h
 [microsoft_natural_keyboard_4000]: https://www.microsoft.com/accessories/en-us/products/keyboards/natural-ergonomic-keyboard-4000/b2m-00012
 [stm32f042]: https://www.st.com/en/microcontrollers-microprocessors/stm32f0-series.html
 [rtic_pr]: https://github.com/rtic-rs/rtic-examples/pull/12
+[gh_sponsor_1]: https://github.com/login?return_to=%2Fsponsors%2Fbrainstorm%2Fsponsorships%3Ftier_id%3D27561
+[mitxela]: https://mitxela.com/forum/topic/beken-bk3231
+[ARM968E-S]: https://static.docs.arm.com/ddi0311/d/DDI0311.pdf
+[beken3231]: https://pdfhost.io/v/3r1I3HggE_BK3231_Bluetooth_HID_SoCpdf.pdf
+[llvm_cpu0]: http://jonathan2251.github.io/lbd/TutorialLLVMBackendCpu0.pdf
+[texitoi]: https://github.com/TeXitoi
+[thezoq2]: https://gitlab.com/TheZoq2/hotas
