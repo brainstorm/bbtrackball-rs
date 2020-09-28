@@ -13,7 +13,7 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 * Remove one of the buttons of the <acronym title="Printed Circuit Board">PCB</acronym>, since it conflicts with one of the trackball GPIOs... oops, hardware blopper ;)
 * Add acceleration [like @LSChyi did][add_accel]?
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
-* If enough people show interest and [**choose to sponsor me**][gh_sponsor_1], look at how to:
+* If enough people show interest and [**choose to sponsor me**][gh_sponsor_1], I would love to look at how to:
 	1. Understand the flash process of the [Beken 3231][beken3231].
 	2. Implement an LLVM backend for the [ARM968E-S][ARM968E-S] and have `rustc` working with it.
 	3. Goal: **have a sub-$1 bluetooth IC that potentially does all we need and more** plus learn to [implement an LLVM backend from scratch][llvm_cpu0]. Also provide [**a way to upcycle bluetooth hardware, keeping it away from the dumpster.**][old_beken_hardware]
