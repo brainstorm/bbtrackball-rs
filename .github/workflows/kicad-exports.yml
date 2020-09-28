@@ -13,49 +13,48 @@ on:
 jobs:
   fabrication:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
 #    - uses: nerdyscout/kicad-exports@v2.0
 #      with:
-#        cmd: report
-#        schematic: hardware/stm32-trackball/stm32_dev.sch
+#        entryPoint: report
+#        schema: hardware/stm32-trackball/stm32_dev.sch
 #        board: hardware/stm32-trackball/stm32_dev.kicad_pcb
     - uses: nerdyscout/kicad-exports@v2.0
       with:
-        cmd: schematic
-        schematic: hardware/stm32-trackball/stm32_dev.sch
+        entryPoint: schema
+        schema: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
-        dir: schematic
+        dir: schema
     - uses: nerdyscout/kicad-exports@v2.0
       with:
-        cmd: kicost
-        schematic: hardware/stm32-trackball/stm32_dev.sch
+        entryPoint: kicost
+        schema: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: bom
     - uses: nerdyscout/kicad-exports@v2.0
       with:
-        cmd: pcbdraw-front 
-        schematic: hardware/stm32-trackball/stm32_dev.sch
+        entryPoint: pcbdraw-front 
+        schema: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: img
     - uses: nerdyscout/kicad-exports@v2.0
       with:
-        cmd: fabrication
-        schematic: hardware/stm32-trackball/stm32_dev.sch
+        entryPoint: fabrication
+        schema: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: gerbers 
         manufacturer: "jlcpcb"
     - uses: nerdyscout/kicad-exports@v2.0
       with:
-        cmd: bom
-        schematic: hardware/stm32-trackball/stm32_dev.sch
+        entryPoint: bom
+        schema: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         dir: bom
     - name: upload gerbers
       uses: actions/upload-artifact@v2
       with:
         name: gerbers
-        schematic: hardware/stm32-trackball/stm32_dev.sch
+        schema: hardware/stm32-trackball/stm32_dev.sch
         board: hardware/stm32-trackball/stm32_dev.kicad_pcb
         path: gerbers
