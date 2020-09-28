@@ -14,9 +14,9 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 * Add acceleration [like @LSChyi did][add_accel]?
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
 * If enough people show interest and [**choose to sponsor me**][gh_sponsor_1], look at how to:
-	1. Download and understand the flash process on the [Beken 3231][beken3231].
+	1. Understand the flash process of the [Beken 3231][beken3231].
 	2. Implement an LLVM backend for the [ARM968E-S][ARM968E-S] and have `rustc` working with it.
-	3. Goal: **have a sub-$1 bluetooth IC that potentially does all we need and more** plus learn to [implement an LLVM backend from scratch][llvm_cpu0] :)  
+	3. Goal: **have a sub-$1 bluetooth IC that potentially does all we need and more** plus learn to [implement an LLVM backend from scratch][llvm_cpu0]. Also provide [**a way to upcycle bluetooth hardware, keeping it away from the dumpster.**][old_beken_hardware]
 * ~~[Write a simplified RTIC example to return the favour to that amazing rust-embedded community][rtic_hid_example]~~: [Done][rtic_pr].
 
 ## :clap: Special thanks to
@@ -50,3 +50,4 @@ And all the folks from the RTIC matrix.org community for patiently guiding and h
 [llvm_cpu0]: http://jonathan2251.github.io/lbd/TutorialLLVMBackendCpu0.pdf
 [texitoi]: https://github.com/TeXitoi
 [thezoq2]: https://gitlab.com/TheZoq2/hotas
+[old_beken_hardware]: https://mitxela.com/forum/topic/mocute-051-bluetooth-gamepad-bk3231-change-hid-profile-from-keyboard-gamepad
