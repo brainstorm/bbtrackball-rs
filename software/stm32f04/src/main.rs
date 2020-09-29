@@ -59,8 +59,7 @@ const APP: () = {
         // This code enables clock for SYSCFG and remaps USB pins to PA9 and PA10.
         usb::remap_pins(&mut dp.RCC, &mut dp.SYSCFG);
 
-        // Power on bbled dance
-        //bbled_red.toggle().ok();
+        // TODO: Power on bbled dance (light up LEDs in a fun pattern when powered on)
 
         rprintln!("Initializing peripherals");
         let mut rcc = dp
@@ -191,7 +190,7 @@ const APP: () = {
     #[idle(resources = [usb_device, usb_hid])]
     fn idle(_: idle::Context) -> ! {
         loop {
-            cortex_m::asm::nop();
+            // Wake From Interrupt
             cortex_m::asm::wfi();
         }
     }
@@ -214,7 +213,6 @@ const APP: () = {
     fn exti_4_15_interrupt(ctx: exti_4_15_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI for PA15...");
 
-        let dev = ctx.resources.usb_device;
         let hid = ctx.resources.usb_hid;
         let usr_led = ctx.resources.usr_led;
 
@@ -222,31 +220,31 @@ const APP: () = {
             0x8000 => {
                 rprintln!("PA15 triggered");
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 0, 1);
+                send_mouse_report(Exclusive(hid), 0, 0, 1);
                 usr_led.toggle().ok();
             }
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 10, 0, 0);
+                send_mouse_report(Exclusive(hid), 5, 0, 0);
                 usr_led.toggle().ok();
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, 10, 0);
+                send_mouse_report(Exclusive(hid), 0, 5, 0);
                 usr_led.toggle().ok();
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), -10, 0, 0);
+                send_mouse_report(Exclusive(hid), -5, 0, 0);
                 usr_led.toggle().ok();
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
-                send_mouse_report(Exclusive(hid), Exclusive(dev), 0, -10, 0);
+                send_mouse_report(Exclusive(hid), 0, -5, 0);
                 usr_led.toggle().ok();
             }
 
@@ -268,7 +266,6 @@ const APP: () = {
 
 fn send_mouse_report(
     mut shared_hid: impl Mutex<T = HIDClass<'static, usb::UsbBusType>>,
-    mut _shared_dev: impl Mutex<T = UsbDevice<'static, usb::UsbBusType>>,
     x: i8,
     y: i8,
     buttons: u8,
