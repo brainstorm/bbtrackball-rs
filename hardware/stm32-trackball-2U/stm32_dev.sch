@@ -1623,10 +1623,10 @@ Wire Wire Line
 Connection ~ 10500 1900
 Wire Wire Line
 	10500 1900 10500 1950
-Text Label 3850 3750 0    50   ~ 0
+Text Label 3800 3350 0    50   ~ 0
 BTN_R
 Wire Wire Line
-	3850 3750 4350 3750
+	3800 3350 4300 3350
 Text Label 6150 3850 2    50   ~ 0
 BTN_L
 Wire Wire Line

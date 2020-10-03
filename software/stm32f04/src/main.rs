@@ -10,7 +10,7 @@ use rtt_target::{rprintln, rtt_init_print};
 
 use stm32f0xx_hal::{
     gpio::gpioa::{PA0, PA1, PA15, PA2, PA3, PA4, PA5, PA6, PA7},
-    gpio::gpiob::{PB1, PB3, PB4},
+    gpio::gpiob::{PB3},
     gpio::{Input, Output, PullUp, PushPull},
     pac,
     prelude::*,
@@ -24,6 +24,7 @@ use usbd_hid::descriptor::MouseReport;
 use usbd_hid::hid_class::HIDClass;
 
 use cortex_m::interrupt::free as disable_interrupts;
+use cortex_m::asm::delay as delay;
 
 #[app(device = stm32f0xx_hal::pac, peripherals = true)]
 const APP: () = {
@@ -32,10 +33,8 @@ const APP: () = {
         usb_device: UsbDevice<'static, usb::UsbBusType>,
         usb_hid: HIDClass<'static, usb::UsbBusType>,
         exti: pac::EXTI,
-        usr_led: PB1<Output<PushPull>>,
-        button3: PA15<Input<PullUp>>,
-        button4: PB4<Input<PullUp>>,
-        button5: PB3<Input<PullUp>>,
+        button_right: PA15<Input<PullUp>>,
+        button_left: PB3<Input<PullUp>>,
         tb_left: PA4<Input<PullUp>>,
         tb_up: PA5<Input<PullUp>>,
         tb_right: PA6<Input<PullUp>>,
@@ -74,13 +73,9 @@ const APP: () = {
 
         // Set up GPIO registers for USR LED and Buttons
         let gpiob = dp.GPIOB.split(&mut rcc);
-        let (usr_led, button4, button5) = disable_interrupts(|cs| {
-            (
-                gpiob.pb1.into_push_pull_output(cs),
-                gpiob.pb4.into_pull_up_input(cs),
+        let button_left = disable_interrupts(|cs|
                 gpiob.pb3.into_pull_up_input(cs),
-            )
-        });
+        );
 
         // LEDs and USB
         let gpioa = dp.GPIOA.split(&mut rcc);
@@ -93,7 +88,7 @@ const APP: () = {
             tb_up,
             tb_right,
             tb_down,
-            button3,
+            button_right,
             usb_dm,
             usb_dp,
         ) = disable_interrupts(|cs| {
@@ -114,7 +109,6 @@ const APP: () = {
 
         // Enable external interrupt for 3 aux buttons...
         dp.SYSCFG.exticr1.write(|w| w.exti3().pb3());
-        // dp.SYSCFG.exticr2.write(|w| { w.exti4().pb4() }); // Disable spare button in favor of tb_left
         dp.SYSCFG.exticr4.write(|w| w.exti15().pa15());
         //... and for pulses on trackball
         dp.SYSCFG.exticr2.write(|w| w.exti4().pa4());
@@ -154,10 +148,10 @@ const APP: () = {
         let usb_hid = HIDClass::new(USB_BUS.as_ref().unwrap(), MouseReport::desc(), 60);
 
         rprintln!("Defining USB parameters...");
-        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
-            .manufacturer("JoshFTW")
+        let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0x6A6A, 0x5442)) // JJ TB
+            .manufacturer("joshajohnson")
             .product("BBTrackball")
-            .serial_number("RustFW")
+            .serial_number("Rust || GTFO")
             .device_class(0x00)
             .device_sub_class(0x00)
             .device_protocol(0x00)
@@ -172,10 +166,8 @@ const APP: () = {
             usb_device,
             usb_hid,
             exti,
-            usr_led,
-            button3,
-            button4,
-            button5,
+            button_right,
+            button_left,
             tb_left,
             tb_up,
             tb_right,
@@ -195,57 +187,57 @@ const APP: () = {
         }
     }
 
-    #[task(binds = EXTI2_3, resources = [exti])]
+    #[task(binds = EXTI2_3, resources = [exti, usb_device, usb_hid])]
     fn exti2_3_interrupt(ctx: exti2_3_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI2_3");
+        let hid = ctx.resources.usb_hid;
 
         match ctx.resources.exti.pr.read().bits() {
             0x8 => {
-                rprintln!("PB3 triggered");
+                rprintln!("Button Right");
                 ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
+                send_mouse_report(Exclusive(hid), 0, 0, 3);
+                delay(1000000);
+                send_mouse_report(Exclusive(hid), 0, 0, 3);
             }
 
             _ => rprintln!("Some other bits were pushed around on EXTI2_3 ;)"),
         }
     }
 
-    #[task(binds = EXTI4_15, resources = [exti, usb_device, usb_hid, usr_led, bbled_red, bbled_grn, bbled_wht, bbled_blu])]
+    #[task(binds = EXTI4_15, resources = [exti, usb_device, usb_hid, bbled_red, bbled_grn, bbled_wht, bbled_blu])]
     fn exti_4_15_interrupt(ctx: exti_4_15_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI for PA15...");
 
         let hid = ctx.resources.usb_hid;
-        let usr_led = ctx.resources.usr_led;
 
         match ctx.resources.exti.pr.read().bits() {
             0x8000 => {
-                rprintln!("PA15 triggered");
+                rprintln!("Button Left");
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
                 send_mouse_report(Exclusive(hid), 0, 0, 1);
-                usr_led.toggle().ok();
+                delay(1000000);
+                send_mouse_report(Exclusive(hid), 0, 0, 1);
             }
             0x10 => {
                 rprintln!("tb_left triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif4().set_bit());
-                send_mouse_report(Exclusive(hid), 5, 0, 0);
-                usr_led.toggle().ok();
+                send_mouse_report(Exclusive(hid), 0, -5, 0);
             }
             0x20 => {
                 rprintln!("tb_up triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif5().set_bit());
-                send_mouse_report(Exclusive(hid), 0, 5, 0);
-                usr_led.toggle().ok();
+                send_mouse_report(Exclusive(hid), 5, 0, 0);
             }
             0x40 => {
                 rprintln!("tb_right triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif6().set_bit());
-                send_mouse_report(Exclusive(hid), -5, 0, 0);
-                usr_led.toggle().ok();
+                send_mouse_report(Exclusive(hid), 0, 5, 0);
             }
             0x80 => {
                 rprintln!("tb_down triggered!");
                 ctx.resources.exti.pr.write(|w| w.pif7().set_bit());
-                send_mouse_report(Exclusive(hid), 0, -5, 0);
-                usr_led.toggle().ok();
+                send_mouse_report(Exclusive(hid), -5, 0, 0);
             }
 
             _ => rprintln!("Some other bits were pushed around on EXTI4_15 ;)"),
@@ -270,7 +262,7 @@ fn send_mouse_report(
     y: i8,
     buttons: u8,
 ) {
-    let mr = MouseReport { x, y, buttons };
+    let mr = MouseReport { x, y, buttons }; // 2U is 90 deg rotated from dev board
 
     shared_hid.lock(|hid| {
         rprintln!("Sending mouse report...");
