@@ -24,6 +24,7 @@ use usbd_hid::descriptor::MouseReport;
 use usbd_hid::hid_class::HIDClass;
 
 use cortex_m::interrupt::free as disable_interrupts;
+use cortex_m::asm::delay as delay;
 
 #[app(device = stm32f0xx_hal::pac, peripherals = true)]
 const APP: () = {
@@ -33,8 +34,8 @@ const APP: () = {
         usb_hid: HIDClass<'static, usb::UsbBusType>,
         exti: pac::EXTI,
         usr_led: PB1<Output<PushPull>>,
-        button3: PA15<Input<PullUp>>,
-        button4: PB4<Input<PullUp>>,
+        button_right: PA15<Input<PullUp>>,
+        button_left: PB4<Input<PullUp>>,
         button5: PB3<Input<PullUp>>,
         tb_left: PA4<Input<PullUp>>,
         tb_up: PA5<Input<PullUp>>,
@@ -74,7 +75,7 @@ const APP: () = {
 
         // Set up GPIO registers for USR LED and Buttons
         let gpiob = dp.GPIOB.split(&mut rcc);
-        let (usr_led, button4, button5) = disable_interrupts(|cs| {
+        let (usr_led, button_left, button5) = disable_interrupts(|cs| {
             (
                 gpiob.pb1.into_push_pull_output(cs),
                 gpiob.pb4.into_pull_up_input(cs),
@@ -93,7 +94,7 @@ const APP: () = {
             tb_up,
             tb_right,
             tb_down,
-            button3,
+            button_right,
             usb_dm,
             usb_dp,
         ) = disable_interrupts(|cs| {
@@ -155,7 +156,7 @@ const APP: () = {
 
         rprintln!("Defining USB parameters...");
         let usb_device = UsbDeviceBuilder::new(USB_BUS.as_ref().unwrap(), UsbVidPid(0, 0x3821))
-            .manufacturer("JoshFTW")
+            .manufacturer("joshajohnson")
             .product("BBTrackball")
             .serial_number("RustFW")
             .device_class(0x00)
@@ -173,8 +174,8 @@ const APP: () = {
             usb_hid,
             exti,
             usr_led,
-            button3,
-            button4,
+            button_right,
+            button_left,
             button5,
             tb_left,
             tb_up,
@@ -195,14 +196,19 @@ const APP: () = {
         }
     }
 
-    #[task(binds = EXTI2_3, resources = [exti])]
+    #[task(binds = EXTI2_3, resources = [exti, usb_device, usb_hid])]
     fn exti2_3_interrupt(ctx: exti2_3_interrupt::Context) {
         rprintln!("Interrupts happening on EXTI2_3");
 
+        let hid = ctx.resources.usb_hid;
+
         match ctx.resources.exti.pr.read().bits() {
             0x8 => {
-                rprintln!("PB3 triggered");
+                rprintln!("Right Button");
                 ctx.resources.exti.pr.write(|w| w.pif3().set_bit()); // Clear interrupt
+                send_mouse_report(Exclusive(hid), 0, 0, 3);
+                delay(1000000);
+                send_mouse_report(Exclusive(hid), 0, 0, 0);
             }
 
             _ => rprintln!("Some other bits were pushed around on EXTI2_3 ;)"),
@@ -218,9 +224,11 @@ const APP: () = {
 
         match ctx.resources.exti.pr.read().bits() {
             0x8000 => {
-                rprintln!("PA15 triggered");
+                rprintln!("Left Button");
                 ctx.resources.exti.pr.write(|w| w.pif15().set_bit()); // Clear interrupt
                 send_mouse_report(Exclusive(hid), 0, 0, 1);
+                delay(1000000);
+                send_mouse_report(Exclusive(hid), 0, 0, 0);
                 usr_led.toggle().ok();
             }
             0x10 => {
