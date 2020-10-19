@@ -13,6 +13,7 @@ This came about [from twitter idea to board, then to Rust Embedded](https://twit
 * Remove one of the buttons of the <acronym title="Printed Circuit Board">PCB</acronym>, since it conflicts with one of the trackball GPIOs... oops, hardware blopper ;)
 * Add acceleration [like @LSChyi did][add_accel]?
 * Perhaps a clever (optical) system to make this experiment actually practical and useful :P
+* On OSX the mouse works fine. **On GNU/Linux systems, the mouse might stop responding after ~30 seconds of use**. [This could be related to the Linux USB autosuspend subsystem.](https://askubuntu.com/questions/185274/how-can-i-disable-usb-autosuspend-for-a-specific-device). Try to fix that from the firmware so that it works everywhere?
 * If enough people show interest and [**choose to sponsor me**][gh_sponsor_1], I would love to look at how to:
 	1. Understand the flash process of the [Beken 3231][beken3231].
 	2. Implement an LLVM backend for the [ARM968E-S][ARM968E-S] and have `rustc` working with it.
