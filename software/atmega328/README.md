@@ -13,6 +13,8 @@ Getting onboard with Rust for embedded devices is like 1,2,3 (more details on th
 
 ```shell
 $ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-$ rustup target add avr-unknown-gnu-atmega328
+$ rustup override set nightly
+$ rustup component add nightly rust-src
+$ rustup target add avr-unknown-gnu-atmega328  # perhaps avr-unknown-unknown works better?
 $ cargo install cargo-embed
 ```
