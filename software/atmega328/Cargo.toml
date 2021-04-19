@@ -14,6 +14,4 @@ usb-device = "0.2.5"
 usbd-hid = "0.4.4"
 panic-halt = "0.2.0"
 panic-semihosting = "0.5"
-rtt-target = { version = "0.2.2", features = ["cortex-m"] }
-panic-rtt-target = { version = "0.1.1", features = ["cortex-m"] }
 ruduino = "0.3"
