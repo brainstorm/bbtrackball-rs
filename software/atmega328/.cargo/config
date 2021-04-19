@@ -1,0 +1,2 @@
+[build]
+target = "avr-unknown-gnu-atmega328"

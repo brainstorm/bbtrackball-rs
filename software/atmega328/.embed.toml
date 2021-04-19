@@ -1,0 +1,6 @@
+[default.general]
+chip = "atmega328"
+
+[default.rtt]
+enabled = true
+show_timestamps = true
